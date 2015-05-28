@@ -1,68 +1,76 @@
 package otechniques.network;
 
 import java.io.IOException;
-import java.util.Map;
+import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingDeque;
 
-import otechniques.packets.KeyPressedPacket;
-import otechniques.packets.KeyReleasedPacket;
 import otechniques.packets.Packet;
 
-import com.esotericsoftware.kryonet.Connection;
-import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 
+/**
+ * Receives packets from clients, and then process them. Received packet are put
+ * to corresponding deque by listener, and instantly processed. Acknowledgments
+ * of received packets and updates of server are put to another queue with
+ * timestamp. However, they are sent after some time, depending on ping parameter.
+ *
+ */
 public class GameNetworkServer {
 	Server server;
+	
 	private int ping = 200;
+	
+	private LinkedBlockingDeque<Packet> receivedPackets;
 	private LinkedBlockingDeque<Packet> packetQueue;
+	private final int PACKET_BUFFER_SIZE = 10;	//TODO przeniesc gdzies
 	
-	private Map<Integer, Boolean> keysClicked;
-	
-	public GameNetworkServer(Map<Integer, Boolean> keysClicked){
+	public GameNetworkServer() {
+		receivedPackets = new LinkedBlockingDeque<>();
+		server = new Server();
 		packetQueue = new LinkedBlockingDeque<Packet>();
-		this.keysClicked = keysClicked;
 		
-	    server = new Server();	    
-	    Packet.registerClasses(server);
-	    server.start();
-	    
-	    try {
-			server.bind(54555, 54777);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	    
-	        
-	    server.addListener(new Listener() {
-	        @Override
-			public void received (Connection connection, Object object) {
-	        	if(object instanceof KeyPressedPacket){
-	        		KeyPressedPacket p = (KeyPressedPacket) object;
-	        		keysClicked.put(p.key, true);
-	        	}
-	        	else if(object instanceof KeyReleasedPacket){
-	        		KeyReleasedPacket p = (KeyReleasedPacket) object;
-	        		keysClicked.put(p.key, false);
-	        	}
-	        }
-	        
-	     });
+		Packet.registerClasses(server);
+		server.start();	
+		server.addListener(new ServerPacketListener(receivedPackets));
+		tryToBind();
 	}
-	
-	public void sendPackets(){	//TODO poprawic te metode na lepsza wydajnosc
+
+	public void sendPackets() { // TODO poprawic te metode na lepsza wydajnosc
 		for (Packet packet : packetQueue) {
-			long currentTime = System.currentTimeMillis(); 
-			if(currentTime - packet.timestamp >= ping){			
+			long currentTime = System.currentTimeMillis();
+			if (currentTime - packet.timestamp >= ping) {
 				server.sendToAllTCP(packet);
 				packetQueue.remove(packet);
 			}
 		}
 	}
-	
-	public void addPacket(Packet p){
+
+	public void addPacket(Packet p) {
 		packetQueue.add(p);
 	}
 	
-}
+	public ArrayList<Packet> getUnprocessedPackets(){ 
+		Packet packet;
+		ArrayList<Packet> unprocessedPackets = new ArrayList<>(receivedPackets.size() + PACKET_BUFFER_SIZE);	//its assumed, that some (possibly not more than buffer size) packets may arrive during copying
+		while( (packet = receivedPackets.poll()) != null){
+			unprocessedPackets.add(packet);
+		}
+		
+		return unprocessedPackets;
+	}
+	
+	public void setPing(int ping){
+		this.ping = ping;	
+	}
+	
+	private void tryToBind(){
+		try {
+			server.bind(54555, 54777);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
 
+}

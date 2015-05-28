@@ -21,18 +21,16 @@ public class FastPaceGame extends ApplicationAdapter {
 
 	@Override
 	public void render () {
-		serverPart.sendPackets();
-		serverPart.processInput();
-		clientPart.sendPackets();
-		clientPart.processReceivedPackets();
+		serverPart.processServerSide();
+		clientPart.processClientSide();
 		
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		//left side of the screen
 	    Gdx.gl.glViewport( 0, 0, Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight() );
-	    clientPart.render();
+	    clientPart.renderGraphics();
 	    //right side
 	    Gdx.gl.glViewport( Gdx.graphics.getWidth()/2, 0, Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight() );
-	    serverPart.render();	
+	    serverPart.renderGraphics();	
 	}
 	
 }

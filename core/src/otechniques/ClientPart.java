@@ -6,7 +6,6 @@ import otechniques.input.InputHandler;
 import otechniques.network.GameNetworkClient;
 import otechniques.objects.GameWorld;
 import otechniques.packets.Packet;
-import otechniques.packets.PlayerPositionPacket;
 import otechniques.render.Renderer;
 
 import com.badlogic.gdx.Gdx;
@@ -16,38 +15,40 @@ public class ClientPart {
 	private Renderer renderer;
 	private InputHandler inputHandler;
 	private GameNetworkClient client;
+	
+	private boolean serverReconciliation;
+	private boolean clientSidePrediction;
+	public static final int CLIENT_ID = 1; //TODO przeniesc gdzie indziej
+	
 	private ArrayBlockingQueue<Packet> receivedPackets;
 	
 	public ClientPart(){
 		receivedPackets = new ArrayBlockingQueue<Packet>(1900);
-		client = new GameNetworkClient(receivedPackets);
+		client = new GameNetworkClient();
 		world = new GameWorld();
 		setupInputHandler();
 		renderer = new Renderer(world);
 	}
 	
-	private void setupInputHandler(){
-		Gdx.input.setInputProcessor(inputHandler = new InputHandler(world, client));
+	public void processClientSide(){
+		client.createInputPackets(inputHandler.getKeysPressed());
+		sendPackets();
+		renderGraphics();
 	}
 	
-	public void render(){
+	private void setupInputHandler(){
+		Gdx.input.setInputProcessor(inputHandler = new InputHandler());
+	}
+	
+	public  void renderGraphics(){
 		renderer.render();
 	}
 	
-	public void sendPackets(){
+	private void sendPackets(){
 		client.sendPackets();
-		inputHandler.processInput();	//TODO przeneisc gdzie indziej
 	}
 	
-	public void processReceivedPackets(){
-		for (Packet packet : receivedPackets) {
-			if(packet instanceof PlayerPositionPacket){
-				PlayerPositionPacket p = (PlayerPositionPacket) packet;	
-				world.getPlayer().x = p.x;
-				world.getPlayer().y = p.y;
-			}
-			receivedPackets.remove(packet);
-		}
-	}
+	
+
 }
  
