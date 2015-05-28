@@ -1,4 +1,4 @@
-package otechniques.network;
+package otechniques.network.server;
 
 import java.util.concurrent.LinkedBlockingDeque;
 

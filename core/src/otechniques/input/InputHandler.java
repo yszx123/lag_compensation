@@ -5,12 +5,12 @@ package otechniques.input;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 
 
 
 public class InputHandler extends InputAdapter {
-
 	
 	private Set<Integer> keysPressed;
 	
@@ -39,6 +39,10 @@ public class InputHandler extends InputAdapter {
 
 	public Integer[] getKeysPressed() {
 		return keysPressed.toArray(new Integer[keysPressed.size()]);
+	}
+	
+	public void setupInputHandler(){
+		Gdx.input.setInputProcessor(this);
 	}
 	
 }

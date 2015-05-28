@@ -1,14 +1,14 @@
 package otechniques.packets;
 
-public class KeysClickedPacket extends Packet {
+public class InputPacket extends Packet {
 
 	public Integer[] keysClicked;
 	public float delta;
 	
 	@SuppressWarnings("unused")
-	private KeysClickedPacket(){}
+	private InputPacket(){}
 	
-	public KeysClickedPacket(int senderID, long sequenceNumber, Integer[] keysPressed, float delta) {
+	public InputPacket(int senderID, long sequenceNumber, Integer[] keysPressed, float delta) {
 		super(senderID, sequenceNumber);
 		this.keysClicked = keysPressed;
 		this.delta = delta;

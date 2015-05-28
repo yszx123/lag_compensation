@@ -2,7 +2,7 @@ package otechniques.packets;
 
 public class PlayerPositionPacket extends Packet {
 
-	float x, y;
+	public float x, y;
 	
 	@SuppressWarnings("unused")
 	private PlayerPositionPacket() {}

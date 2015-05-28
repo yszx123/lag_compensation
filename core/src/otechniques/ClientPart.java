@@ -1,54 +1,39 @@
 package otechniques;
 
-import java.util.concurrent.ArrayBlockingQueue;
-
+import otechniques.controller.ClientController;
 import otechniques.input.InputHandler;
-import otechniques.network.GameNetworkClient;
+import otechniques.network.client.GameNetworkClient;
 import otechniques.objects.GameWorld;
-import otechniques.packets.Packet;
 import otechniques.render.Renderer;
 
-import com.badlogic.gdx.Gdx;
-
 public class ClientPart {
-	private GameWorld world;
 	private Renderer renderer;
 	private InputHandler inputHandler;
+	private ClientController controller;
 	private GameNetworkClient client;
 	
 	private boolean serverReconciliation;
 	private boolean clientSidePrediction;
 	public static final int CLIENT_ID = 1; //TODO przeniesc gdzie indziej
 	
-	private ArrayBlockingQueue<Packet> receivedPackets;
-	
 	public ClientPart(){
-		receivedPackets = new ArrayBlockingQueue<Packet>(1900);
 		client = new GameNetworkClient();
-		world = new GameWorld();
-		setupInputHandler();
+		GameWorld world = new GameWorld();
+		inputHandler = new InputHandler();
+		inputHandler.setupInputHandler();
+		controller = new ClientController(world, client);
 		renderer = new Renderer(world);
 	}
 	
 	public void processClientSide(){
 		client.createInputPackets(inputHandler.getKeysPressed());
-		sendPackets();
-		renderGraphics();
+		client.sendPackets();
+		controller.updateGameState();
 	}
 	
-	private void setupInputHandler(){
-		Gdx.input.setInputProcessor(inputHandler = new InputHandler());
-	}
-	
-	public  void renderGraphics(){
+	public void renderGraphics(){
 		renderer.render();
 	}
 	
-	private void sendPackets(){
-		client.sendPackets();
-	}
-	
-	
-
 }
  

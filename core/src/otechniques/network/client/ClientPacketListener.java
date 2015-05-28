@@ -1,6 +1,6 @@
-package otechniques.network;
+package otechniques.network.client;
 
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import otechniques.packets.Packet;
 import otechniques.packets.PlayerPositionPacket;
@@ -10,11 +10,11 @@ import com.esotericsoftware.kryonet.Listener;
 
 public class ClientPacketListener extends Listener{
 	
-	private LinkedBlockingDeque<Packet> receivedPackets;
+	private ConcurrentLinkedQueue<Packet> receivedPackets;
 	
-	public  ClientPacketListener(LinkedBlockingDeque<Packet> receivedPackets) {
+	public  ClientPacketListener(ConcurrentLinkedQueue<Packet> receivedPackets2) {
 		super();
-		this.receivedPackets = receivedPackets;
+		this.receivedPackets = receivedPackets2;
 		
 	}	
 	

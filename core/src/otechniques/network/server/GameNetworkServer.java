@@ -1,4 +1,4 @@
-package otechniques.network;
+package otechniques.network.server;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,7 +10,7 @@ import com.esotericsoftware.kryonet.Server;
 
 /**
  * Receives packets from clients, and then process them. Received packet are put
- * to corresponding deque by listener, and instantly processed. Acknowledgments
+ * to corresponding deque by listener, and processed in the next timestep. Acknowledgments
  * of received packets and updates of server are put to another queue with
  * timestamp. However, they are sent after some time, depending on ping parameter.
  *
@@ -19,10 +19,10 @@ public class GameNetworkServer {
 	Server server;
 	
 	private int ping = 200;
-	
+	int a=0;
 	private LinkedBlockingDeque<Packet> receivedPackets;
 	private LinkedBlockingDeque<Packet> packetQueue;
-	private final int PACKET_BUFFER_SIZE = 10;	//TODO przeniesc gdzies
+	private final int PACKET_BUFFER_SIZE = 10;	//TODO przeniesc gdzies i zmienic nazwe
 	
 	public GameNetworkServer() {
 		receivedPackets = new LinkedBlockingDeque<>();

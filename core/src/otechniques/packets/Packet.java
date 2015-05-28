@@ -27,7 +27,7 @@ public abstract class Packet {
 	public static void registerClasses(EndPoint endpoint){
 		Kryo kryo = endpoint.getKryo();
 		
-		kryo.register(KeysClickedPacket.class);
+		kryo.register(InputPacket.class);
 		kryo.register(PlayerPositionPacket.class);
 		
 		kryo.register(Integer[].class);
