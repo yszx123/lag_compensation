@@ -12,8 +12,8 @@ public class ClientPart {
 	private ClientController controller;
 	private GameNetworkClient client;
 	
-	private boolean serverReconciliation;
-	private boolean clientSidePrediction;
+	public static boolean serverReconciliation = true;
+	public static boolean clientSidePrediction = true;
 	public static final int CLIENT_ID = 1; //TODO przeniesc gdzie indziej
 	
 	public ClientPart(){
@@ -21,14 +21,13 @@ public class ClientPart {
 		GameWorld world = new GameWorld();
 		inputHandler = new InputHandler();
 		inputHandler.setupInputHandler();
-		controller = new ClientController(world, client);
+		controller = new ClientController(world, client, inputHandler);
 		renderer = new Renderer(world);
 	}
 	
 	public void processClientSide(){
-		client.createInputPackets(inputHandler.getKeysPressed());
-		client.sendPackets();
 		controller.updateGameState();
+		client.sendPackets();
 	}
 	
 	public void renderGraphics(){

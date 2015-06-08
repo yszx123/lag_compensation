@@ -34,7 +34,7 @@ public class ServerController {
 		for (int key : packet.keysClicked) {
 			if(key == Keys.W){
 				world.getPlayer().y += 1;
-				server.addPacket(new PlayerPositionPacket(ServerPart.SERVER_ID, packet.sequenceNumber));
+				server.addPacket(new PlayerPositionPacket(ServerPart.SERVER_ID, packet.sequenceNumber, world.getPlayer().x, world.getPlayer().y));
 			}
 		}
 	}

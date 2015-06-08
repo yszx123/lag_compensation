@@ -7,8 +7,10 @@ public class PlayerPositionPacket extends Packet {
 	@SuppressWarnings("unused")
 	private PlayerPositionPacket() {}
 
-	public PlayerPositionPacket(int senderID, long sequenceNumber) {
+	public PlayerPositionPacket(int senderID, long sequenceNumber, float x, float y) {
 		super(senderID, sequenceNumber);
+		this.x = x;
+		this.y = y;
 	}
 
 }
