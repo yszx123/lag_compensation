@@ -1,30 +1,42 @@
 package otechniques.controller;
 
+import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+
 import otechniques.ClientPart;
+import otechniques.Config;
 import otechniques.input.InputHandler;
 import otechniques.network.client.GameNetworkClient;
 import otechniques.objects.GameWorld;
 import otechniques.packets.InputPacket;
-import otechniques.packets.Packet;
 import otechniques.packets.PlayerPositionPacket;
 
-import com.badlogic.gdx.Input.Keys;
-
 public class ClientController {
-	private GameWorld world;
+	private GameWorld gameWorld;
 	private GameNetworkClient client;
 	private InputHandler inputHandler;
 
 	public ClientController(GameWorld world, GameNetworkClient client, InputHandler inputHandler) {
-		this.world = world;
+		this.gameWorld = world;
 		this.client = client;
 		this.inputHandler = inputHandler;
 	}
 
 	//TODO usuwanie pakietow, jezeli sa nowsze danego typu
-	public void updateGameState() {
+	public void updateGameState(float timeStep) {
+		applyRecentInput();
+		gameWorld.getWorld().step(timeStep, Config.VELOCITY_ITERATIONS, Config.POSITION_ITERATIONS);
+		//gameWorld.getPlayer().body.applyLinearImpulse(new Vector2(10,10), getPlayerBody().getPosition(), true);
 		
-		if(ClientPart.clientSidePrediction == true){
+		
+		
+		
+		
+		
+		
+/*		tak bylo przed zmianami na sztywno
+ * 		if(ClientPart.clientSidePrediction == true){
 			applyRecentInput();
 		}
 		
@@ -37,7 +49,8 @@ public class ClientController {
 				calculatePlayerPosition((PlayerPositionPacket) packet);			
 			}			
 			
-		}
+		}*/
+		
 	} 
 
 
@@ -46,15 +59,29 @@ public class ClientController {
 	 * applies player's input instantly, not waiting for server acknowledgment
 	 */
 	private void applyRecentInput(){
+		Vector2 playerMovement = new Vector2();
+		
 		for (int key : inputHandler.getKeysPressed()) {
 			if(key == Keys.W){
-				world.getPlayer().y += 1;
+				playerMovement.add(new Vector2(0, Config.PLAYER_SPEED));
 			}
+			else if (key == Keys.S){
+				playerMovement.add(new Vector2(0,-Config.PLAYER_SPEED));
+			}
+			else if (key == Keys.A){
+				playerMovement.add(new Vector2(-Config.PLAYER_SPEED,0));
+			}
+			else if (key == Keys.D){
+				playerMovement.add(new Vector2(Config.PLAYER_SPEED,0));
+			}			
 		}
+				
+		getPlayerBody().setLinearVelocity(playerMovement);	
+		
 	}
 	
 	private void calculatePlayerPosition(PlayerPositionPacket positionPacket){
-		world.getPlayer().setPosition(positionPacket.x, positionPacket.y);
+		gameWorld.getPlayer().setPosition(positionPacket.x, positionPacket.y);
 		
 		if(ClientPart.serverReconciliation == true){
 			for(int i = 0; i < client.getPendingInputPackets().size(); i++){		
@@ -65,7 +92,7 @@ public class ClientController {
 					InputPacket inputPacket = client.getPendingInputPackets().get(i);
 					for (int key : inputPacket.keysClicked) {
 						if(key == Keys.W){
-							world.getPlayer().y += 1;
+							gameWorld.getPlayer().y += 1;
 						}
 					}
 				}
@@ -75,6 +102,11 @@ public class ClientController {
 			client.getPendingInputPackets().clear();
 		}	
 	}
+	
+	private Body getPlayerBody(){
+		return gameWorld.getPlayer().body;
+	}
+	
 	
 	
 }

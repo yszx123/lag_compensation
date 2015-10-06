@@ -4,14 +4,15 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import otechniques.ClientPart;
-import otechniques.packets.InputPacket;
-import otechniques.packets.Packet;
-
 import com.badlogic.gdx.Gdx;
 import com.esotericsoftware.kryonet.Client;
 
+import otechniques.Config;
+import otechniques.packets.InputPacket;
+import otechniques.packets.Packet;
+
 public class GameNetworkClient {
+	private int clientId;
 	private Client client;
 	private LinkedList<Packet> packetsToSend;// queue simulating ping, after
 												// sending the packet, it's
@@ -20,7 +21,6 @@ public class GameNetworkClient {
 	private LinkedList<InputPacket>pendingInputPackets; // packets waiting for acknowledgment from the
 	// server
 	private ConcurrentLinkedQueue<Packet> receivedPackets;
-	private int ping = 200; // TODO przeniesc
 	private long lastSequenceNumber;
 
 	public GameNetworkClient() {
@@ -43,19 +43,11 @@ public class GameNetworkClient {
 		long currentTime = System.currentTimeMillis();
 
 		while (packetsToSend.size() != 0
-				&& currentTime - packetsToSend.getFirst().timestamp >= ping) {
+				&& currentTime - packetsToSend.getFirst().timestamp >= Config.CLIENT_PING) {
 			
 			Packet packet = packetsToSend.removeFirst();
 			client.sendTCP(packet);
 		}
-	}
-
-	/**
-	 * @param ping
-	 *            - latency in packets sending, in milliseconds
-	 */
-	public void setSendingPing(int ping) {
-		this.ping = ping;
 	}
 
 	/**
@@ -69,7 +61,7 @@ public class GameNetworkClient {
 	 */
 	public void createInputPackets(Integer[] keysPressed) {
 		if (keysPressed.length != 0) {
-			InputPacket packet = new InputPacket(ClientPart.CLIENT_ID,
+			InputPacket packet = new InputPacket(clientId,
 					++lastSequenceNumber, keysPressed, Gdx.graphics
 					.getDeltaTime());
 			packetsToSend.add(packet);
@@ -85,11 +77,16 @@ public class GameNetworkClient {
 		return receivedPackets;
 	}
 
-	private void tryToConnect() { // TODO parametryzacja
+	private void tryToConnect() {
 		try {
-			client.connect(5000, "localhost", 54555, 54777);
+			client.connect(Config.CLIENT_CONNECT_TIMEOUT, Config.SERVER_HOST, Config.TCP_PORT, Config.UDP_PORT);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
+	
+	public void setClientId(int clientId){
+		this.clientId = clientId;
+	}
+	
 }

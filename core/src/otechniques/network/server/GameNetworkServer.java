@@ -4,9 +4,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingDeque;
 
-import otechniques.packets.Packet;
-
 import com.esotericsoftware.kryonet.Server;
+
+import otechniques.Config;
+import otechniques.packets.Packet;
 
 /**
  * Receives packets from clients, and then process them. Received packet are put
@@ -18,11 +19,9 @@ import com.esotericsoftware.kryonet.Server;
 public class GameNetworkServer {
 	Server server;
 	
-	private int ping = 200;
 	int a=0;
 	private LinkedBlockingDeque<Packet> receivedPackets;
 	private LinkedBlockingDeque<Packet> packetQueue;
-	private final int PACKET_BUFFER_SIZE = 10;	//TODO przeniesc gdzies i zmienic nazwe
 	
 	public GameNetworkServer() {
 		receivedPackets = new LinkedBlockingDeque<>();
@@ -38,7 +37,7 @@ public class GameNetworkServer {
 	public void sendPackets() { // TODO poprawic te metode na lepsza wydajnosc
 		for (Packet packet : packetQueue) {
 			long currentTime = System.currentTimeMillis();
-			if (currentTime - packet.timestamp >= ping) {
+			if (currentTime - packet.timestamp >= Config.SERVER_PING) {
 				server.sendToAllTCP(packet);
 				packetQueue.remove(packet);
 			}
@@ -51,7 +50,7 @@ public class GameNetworkServer {
 	
 	public ArrayList<Packet> getUnprocessedPackets(){ 
 		Packet packet;
-		ArrayList<Packet> unprocessedPackets = new ArrayList<>(receivedPackets.size() + PACKET_BUFFER_SIZE);	//its assumed, that some (possibly not more than buffer size) packets may arrive during copying
+		ArrayList<Packet> unprocessedPackets = new ArrayList<>(receivedPackets.size() + Config.SERVER_PACKET_BUFFER_SIZE);	//its assumed, that some (possibly not more than buffer size) packets may arrive during copying
 		while( (packet = receivedPackets.poll()) != null){
 			unprocessedPackets.add(packet);
 		}
@@ -59,13 +58,9 @@ public class GameNetworkServer {
 		return unprocessedPackets;
 	}
 	
-	public void setPing(int ping){
-		this.ping = ping;	
-	}
-	
 	private void tryToBind(){
 		try {
-			server.bind(54555, 54777);
+			server.bind(Config.TCP_PORT, Config.UDP_PORT);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

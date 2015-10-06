@@ -4,35 +4,53 @@ import otechniques.controller.ClientController;
 import otechniques.input.InputHandler;
 import otechniques.network.client.GameNetworkClient;
 import otechniques.objects.GameWorld;
+import otechniques.render.DebugRenderer;
+import otechniques.render.IRenderer;
 import otechniques.render.Renderer;
 
 public class ClientPart {
-	private Renderer renderer;
+	private IRenderer renderer;
 	private InputHandler inputHandler;
 	private ClientController controller;
-	private GameNetworkClient client;
+	private GameNetworkClient networkClient;
+	private GameWorld gameWorld;
 	
 	public static boolean serverReconciliation = true;
 	public static boolean clientSidePrediction = true;
-	public static final int CLIENT_ID = 1; //TODO przeniesc gdzie indziej
+	public final int CLIENT_ID;
 	
-	public ClientPart(){
-		client = new GameNetworkClient();
-		GameWorld world = new GameWorld();
+	public ClientPart(int clientId){
+		this.CLIENT_ID = clientId;
+		
+		networkClient = new GameNetworkClient();
+		networkClient.setClientId(clientId);
+		
+		gameWorld = new GameWorld();
+		
 		inputHandler = new InputHandler();
 		inputHandler.setupInputHandler();
-		controller = new ClientController(world, client, inputHandler);
-		renderer = new Renderer(world);
+		
+		controller = new ClientController(gameWorld, networkClient, inputHandler);
+		
+		if(Config.DEBUG_RENDER){
+			renderer = new DebugRenderer(gameWorld.getWorld());
+		}
+		else{
+			renderer = new Renderer(gameWorld);
+		}
 	}
 	
 	public void processClientSide(){
-		controller.updateGameState();
-		client.sendPackets();
+		controller.updateGameState(Config.PHYSICS_TIMESTEP);	//TODO timestep
+		networkClient.sendPackets();
 	}
 	
 	public void renderGraphics(){
 		renderer.render();
 	}
 	
+	public void resize(int width, int height){
+		renderer.resize(width, height);
+	}
 }
  
