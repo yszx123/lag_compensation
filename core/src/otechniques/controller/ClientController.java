@@ -3,6 +3,7 @@ package otechniques.controller;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.sun.jmx.snmp.Timestamp;
 
 import otechniques.ClientPart;
 import otechniques.Config;
@@ -10,6 +11,7 @@ import otechniques.input.InputHandler;
 import otechniques.network.client.GameNetworkClient;
 import otechniques.objects.GameWorld;
 import otechniques.packets.InputPacket;
+import otechniques.packets.Packet;
 import otechniques.packets.PlayerPositionPacket;
 
 public class ClientController {
@@ -24,44 +26,41 @@ public class ClientController {
 	}
 
 	//TODO usuwanie pakietow, jezeli sa nowsze danego typu
-	public void updateGameState(float timeStep) {
-		applyRecentInput();
-		gameWorld.getWorld().step(timeStep, Config.VELOCITY_ITERATIONS, Config.POSITION_ITERATIONS);
-		//gameWorld.getPlayer().body.applyLinearImpulse(new Vector2(10,10), getPlayerBody().getPosition(), true);
+	public void updateGameState(float timeStep) {		
+		client.createInputPackets(inputHandler.getKeysPressed(), getPlayerBody().getPosition());
 		
-		
-		
-		
-		
-		
-		
-/*		tak bylo przed zmianami na sztywno
- * 		if(ClientPart.clientSidePrediction == true){
-			applyRecentInput();
-		}
-		
-		client.createInputPackets(inputHandler.getKeysPressed());
-		
+		//iterate over all received packets to update gamestate accordingly to server state
 		while (client.getReceivedPackets().size() != 0){
 			Packet packet = client.getReceivedPackets().remove();
 			
 			if(packet instanceof PlayerPositionPacket){
 				calculatePlayerPosition((PlayerPositionPacket) packet);			
-			}			
+			}//else if(...)			
 			
-		}*/
+		}
+			
+		if(Config.CLIENT_SIDE_PREDICTION){
+			applyRecentInput();
+		}
 		
+		
+		gameWorld.getWorld().step(timeStep, Config.VELOCITY_ITERATIONS, Config.POSITION_ITERATIONS);	
+		//System.out.println("klient: " +getPlayerBody().getPosition().toString()); TODO
 	} 
-
-
 	
 	/**
-	 * applies player's input instantly, not waiting for server acknowledgment
+	 * applies player's input instantly, basing on currently pressed keys, not waiting for server acknowledgment
 	 */
-	private void applyRecentInput(){
+	private void applyRecentInput(){				
+		getPlayerBody().setLinearVelocity(calculateMovementVector(inputHandler.getKeysPressed()));		
+	}
+	
+	/**
+	 * @return vector representing player's movement direction
+	 */
+	private Vector2 calculateMovementVector(Integer[] keysClicked){
 		Vector2 playerMovement = new Vector2();
-		
-		for (int key : inputHandler.getKeysPressed()) {
+		for (int key : keysClicked) {
 			if(key == Keys.W){
 				playerMovement.add(new Vector2(0, Config.PLAYER_SPEED));
 			}
@@ -75,27 +74,29 @@ public class ClientController {
 				playerMovement.add(new Vector2(Config.PLAYER_SPEED,0));
 			}			
 		}
-				
-		getPlayerBody().setLinearVelocity(playerMovement);	
-		
+		return playerMovement;
 	}
 	
 	private void calculatePlayerPosition(PlayerPositionPacket positionPacket){
 		gameWorld.getPlayer().setPosition(positionPacket.x, positionPacket.y);
+		long acknowledgedPacketTimestamp = positionPacket.clientTimestamp;
 		
-		if(ClientPart.serverReconciliation == true){
-			for(int i = 0; i < client.getPendingInputPackets().size(); i++){		
+		if(Config.SERVER_RECONCILIATION){			
+			for(int i = 0; i < client.getPendingInputPackets().size(); i++){	
+				//removes all packets, which were already acknowledged and applied to client
 				if(client.getPendingInputPackets().get(i).sequenceNumber <= positionPacket.sequenceNumber){
 					client.getPendingInputPackets().remove(i);
 				}
 				else{
 					InputPacket inputPacket = client.getPendingInputPackets().get(i);
-					for (int key : inputPacket.keysClicked) {
-						if(key == Keys.W){
-							gameWorld.getPlayer().y += 1;
-						}
-					}
-				}
+					gameWorld.getPlayer().setPosition(inputPacket.playerPosition);
+					/*Vector2 playerMovementVector = calculateMovementVector(inputPacket.keysClicked);
+					getPlayerBody().setLinearVelocity(playerMovementVector);
+					long timespanBetweenPackets = inputPacket.timestamp - acknowledgedPacketTimestamp;
+					float timespanInSeconds = timespanBetweenPackets / 1000f;
+					System.out.println(timespanInSeconds);
+					gameWorld.getWorld().step(timespanInSeconds, Config.VELOCITY_ITERATIONS, Config.POSITION_ITERATIONS); //TODO nieforutunne miejsce na krok
+*/				}
 			}
 		}
 		else{

@@ -3,6 +3,7 @@ package otechniques.packets;
 public class PlayerPositionPacket extends Packet {
 
 	public float x, y;
+	public long clientTimestamp;
 	
 	@SuppressWarnings("unused")
 	private PlayerPositionPacket() {}

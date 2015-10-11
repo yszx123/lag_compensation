@@ -15,8 +15,6 @@ public class ClientPart {
 	private GameNetworkClient networkClient;
 	private GameWorld gameWorld;
 	
-	public static boolean serverReconciliation = true;
-	public static boolean clientSidePrediction = true;
 	public final int CLIENT_ID;
 	
 	public ClientPart(int clientId){
@@ -32,16 +30,11 @@ public class ClientPart {
 		
 		controller = new ClientController(gameWorld, networkClient, inputHandler);
 		
-		if(Config.DEBUG_RENDER){
-			renderer = new DebugRenderer(gameWorld.getWorld());
-		}
-		else{
-			renderer = new Renderer(gameWorld);
-		}
+		renderer = Config.DEBUG_RENDER ? new DebugRenderer(gameWorld.getWorld()) : new Renderer(gameWorld);
 	}
 	
 	public void processClientSide(){
-		controller.updateGameState(Config.PHYSICS_TIMESTEP);	//TODO timestep
+		controller.updateGameState(Config.CLIENT_PHYSICIS_TIMESTEP);	//TODO timestep
 		networkClient.sendPackets();
 	}
 	

@@ -3,6 +3,7 @@ package otechniques;
 import otechniques.controller.ServerController;
 import otechniques.network.server.GameNetworkServer;
 import otechniques.objects.GameWorld;
+import otechniques.render.DebugRenderer;
 import otechniques.render.IRenderer;
 import otechniques.render.Renderer;
 
@@ -17,7 +18,7 @@ public class ServerPart {
 		server = new GameNetworkServer();
 		GameWorld gameWorld = new GameWorld(); 
 		controller = new ServerController(gameWorld, server);
-		renderer = new Renderer(gameWorld);
+		renderer = Config.DEBUG_RENDER ? new DebugRenderer(gameWorld.getWorld()) : new Renderer(gameWorld);
 	}
 	
 	public void renderGraphics(){
@@ -25,7 +26,7 @@ public class ServerPart {
 	}
 	
 	public void processServerSide(){
-		controller.processReceivedPackets(server.getUnprocessedPackets());
+		controller.updateGamestate(server.getUnprocessedPackets());
 		server.sendPackets();
 	}
 			

@@ -11,7 +11,11 @@ public class Config {
 	public static final boolean DEBUG_RENDER = true;
 	public static final int VELOCITY_ITERATIONS = 8;
 	public static final int POSITION_ITERATIONS = 3;
-	public static final float PHYSICS_TIMESTEP = 1/2f;	//TODO tego byc nie powinno 
+	public static final float CLIENT_PHYSICIS_TIMESTEP = 1/60f;	
+	public static final float SERVER_PHYSICS_TIMESTEP = 1/60f;
 	public static long SERVER_PING = 200;
-	public static float PLAYER_SPEED = 10;
+	public static float PLAYER_SPEED = 100;
+	
+	public static final boolean SERVER_RECONCILIATION = true;
+	public static boolean CLIENT_SIDE_PREDICTION = true;
 }

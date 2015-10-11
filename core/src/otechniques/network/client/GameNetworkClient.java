@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryonet.Client;
 
 import otechniques.Config;
@@ -59,11 +60,12 @@ public class GameNetworkClient {
 	 * @param keysPressed
 	 *            - list of keys currently pressed
 	 */
-	public void createInputPackets(Integer[] keysPressed) {
+	public void createInputPackets(Integer[] keysPressed, Vector2 pos) { //TODO bez wektora pos
 		if (keysPressed.length != 0) {
 			InputPacket packet = new InputPacket(clientId,
 					++lastSequenceNumber, keysPressed, Gdx.graphics
 					.getDeltaTime());
+			packet.playerPosition = pos;
 			packetsToSend.add(packet);
 			pendingInputPackets.add(packet);
 		}

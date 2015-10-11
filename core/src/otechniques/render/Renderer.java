@@ -34,7 +34,7 @@ public class Renderer implements IRenderer{
 		camera.update();
 		BATCH.setProjectionMatrix(camera.combined);
 		BATCH.begin();
-		BATCH.draw(Assets.texture, world.getPlayer().x, world.getPlayer().y);
+		BATCH.draw(Assets.texture, world.getPlayer().getPosition().x, world.getPlayer().getPosition().y);
 		BATCH.end();
 	}
 }

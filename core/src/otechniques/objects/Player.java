@@ -11,7 +11,6 @@ import otechniques.Config;
 
 public class Player {
 	public Body body;
-	public float x,y;
 
 	public Player(float x, float y, World world) {
 		BodyDef bodyDef = new BodyDef();
@@ -31,9 +30,12 @@ public class Player {
 		
 	}
 
-	public void setPosition(float x2, float y2) {
-/*		this.x = x2;
-		this.y = y2;*/
+	public void setPosition(Vector2 pos){
+		body.setTransform(pos, body.getAngle());
+	}
+	
+	public void setPosition(float x, float y) {
+		body.setTransform(new Vector2(x, y), body.getAngle());
 	}
 	
 	public Vector2 getPosition(){
