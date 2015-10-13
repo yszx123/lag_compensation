@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryonet.Client;
 
 import otechniques.Config;
@@ -15,19 +14,16 @@ import otechniques.packets.Packet;
 public class GameNetworkClient {
 	private int clientId;
 	private Client client;
-	private LinkedList<Packet> packetsToSend;// queue simulating ping, after
-												// sending the packet, it's
-												// moved to pending packets
-												// queue
-	private LinkedList<InputPacket>pendingInputPackets; // packets waiting for acknowledgment from the
-	// server
+	/**
+	 * queue simulating ping
+	 */
+	private LinkedList<Packet> packetsToSend;
 	private ConcurrentLinkedQueue<Packet> receivedPackets;
 	private long lastSequenceNumber;
 
 	public GameNetworkClient() {
 		client = new Client();
 		packetsToSend = new LinkedList<>();
-		pendingInputPackets = new LinkedList<>();
 		receivedPackets = new ConcurrentLinkedQueue<>();
 
 		Packet.registerClasses(client);
@@ -40,12 +36,10 @@ public class GameNetworkClient {
 		packetsToSend.add(p);
 	}
 
-	public void sendPackets() {	//TODO zmiana na zegar
+	public void sendPackets() { // TODO zmiana na zegar
 		long currentTime = System.currentTimeMillis();
 
-		while (packetsToSend.size() != 0
-				&& currentTime - packetsToSend.getFirst().timestamp >= Config.CLIENT_PING) {
-			
+		while (packetsToSend.size() != 0 && currentTime - packetsToSend.getFirst().timestamp >= Config.CLIENT_PING) {
 			Packet packet = packetsToSend.removeFirst();
 			client.sendTCP(packet);
 		}
@@ -54,25 +48,14 @@ public class GameNetworkClient {
 	/**
 	 * Creates new packets and inserts them to the queue of packets, waiting for
 	 * being sent to the server, basing on list of currently pressed keys. Sent
-	 * packets are inserted into list of pending packets, wait for
-	 * acknowledgment from server.
+	 * packets wait for acknowledgment from server.
 	 * 
 	 * @param keysPressed
 	 *            - list of keys currently pressed
 	 */
-	public void createInputPackets(Integer[] keysPressed, Vector2 pos) { //TODO bez wektora pos
-		if (keysPressed.length != 0) {
-			InputPacket packet = new InputPacket(clientId,
-					++lastSequenceNumber, keysPressed, Gdx.graphics
-					.getDeltaTime());
-			packet.playerPosition = pos;
-			packetsToSend.add(packet);
-			pendingInputPackets.add(packet);
-		}
-	}
-
-	public LinkedList<InputPacket> getPendingInputPackets() {
-		return pendingInputPackets;
+	public void createInputPackets(Integer[] keysPressed) {
+		InputPacket packet = new InputPacket(clientId, ++lastSequenceNumber, keysPressed, Gdx.graphics.getDeltaTime());
+		packetsToSend.add(packet);
 	}
 
 	public ConcurrentLinkedQueue<Packet> getReceivedPackets() {
@@ -86,9 +69,13 @@ public class GameNetworkClient {
 			e.printStackTrace();
 		}
 	}
-	
-	public void setClientId(int clientId){
+
+	public void setClientId(int clientId) {
 		this.clientId = clientId;
 	}
-	
+
+	public long getLastSequenceNumber() {
+		return lastSequenceNumber;
+	}
+
 }

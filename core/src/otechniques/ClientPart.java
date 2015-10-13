@@ -5,11 +5,11 @@ import otechniques.input.InputHandler;
 import otechniques.network.client.GameNetworkClient;
 import otechniques.objects.GameWorld;
 import otechniques.render.DebugRenderer;
-import otechniques.render.IRenderer;
 import otechniques.render.Renderer;
+import otechniques.render.StandardRenderer;
 
 public class ClientPart {
-	private IRenderer renderer;
+	private Renderer renderer;
 	private InputHandler inputHandler;
 	private ClientController controller;
 	private GameNetworkClient networkClient;
@@ -30,7 +30,7 @@ public class ClientPart {
 		
 		controller = new ClientController(gameWorld, networkClient, inputHandler);
 		
-		renderer = Config.DEBUG_RENDER ? new DebugRenderer(gameWorld.getWorld()) : new Renderer(gameWorld);
+		renderer = Config.DEBUG_RENDER ? new DebugRenderer(gameWorld.getWorld()) : new StandardRenderer(gameWorld);
 	}
 	
 	public void processClientSide(){

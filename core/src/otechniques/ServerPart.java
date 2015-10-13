@@ -4,13 +4,13 @@ import otechniques.controller.ServerController;
 import otechniques.network.server.GameNetworkServer;
 import otechniques.objects.GameWorld;
 import otechniques.render.DebugRenderer;
-import otechniques.render.IRenderer;
 import otechniques.render.Renderer;
+import otechniques.render.StandardRenderer;
 
 public class ServerPart {
 	GameNetworkServer server;
 	ServerController controller;
-	IRenderer renderer;
+	Renderer renderer;
 	
 	public static final int SERVER_ID = 0; //TODO przeniesc
 	
@@ -18,7 +18,7 @@ public class ServerPart {
 		server = new GameNetworkServer();
 		GameWorld gameWorld = new GameWorld(); 
 		controller = new ServerController(gameWorld, server);
-		renderer = Config.DEBUG_RENDER ? new DebugRenderer(gameWorld.getWorld()) : new Renderer(gameWorld);
+		renderer = Config.DEBUG_RENDER ? new DebugRenderer(gameWorld.getWorld()) : new StandardRenderer(gameWorld);
 	}
 	
 	public void renderGraphics(){

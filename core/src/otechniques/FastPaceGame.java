@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.GL20;
 public class FastPaceGame extends ApplicationAdapter {
 	ClientPart clientPart;
 	ServerPart serverPart;
-	
+
 	@Override
 	public void create () {	
 		serverPart = new ServerPart();
