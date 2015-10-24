@@ -8,5 +8,5 @@ public class DeltaMovement {
 	 * number of packet, which was generated to illustrate this movement delta
 	 */
 	public long sequenceNumber;
-	
+
 }

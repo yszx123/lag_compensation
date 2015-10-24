@@ -2,6 +2,7 @@ package otechniques.network.client;
 
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.badlogic.gdx.Gdx;
@@ -41,7 +42,7 @@ public class GameNetworkClient {
 
 		while (packetsToSend.size() != 0 && currentTime - packetsToSend.getFirst().timestamp >= Config.CLIENT_PING) {
 			Packet packet = packetsToSend.removeFirst();
-			client.sendTCP(packet);
+			client.sendUDP(packet);
 		}
 	}
 
@@ -53,8 +54,10 @@ public class GameNetworkClient {
 	 * @param keysPressed
 	 *            - list of keys currently pressed
 	 */
-	public void createInputPackets(Integer[] keysPressed) {
-		InputPacket packet = new InputPacket(clientId, ++lastSequenceNumber, keysPressed, Gdx.graphics.getDeltaTime());
+	public void createInputPackets(Set<Integer> keysPressed) {
+		Integer[] keysPressedArray = keysPressed.toArray(new Integer[keysPressed.size()]);
+		InputPacket packet = new InputPacket(clientId, ++lastSequenceNumber, keysPressedArray,
+				Gdx.graphics.getDeltaTime());
 		packetsToSend.add(packet);
 	}
 

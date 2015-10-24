@@ -19,7 +19,6 @@ import otechniques.packets.Packet;
 public class GameNetworkServer {
 	Server server;
 	
-	int a=0;
 	private LinkedBlockingDeque<Packet> receivedPackets;
 	private LinkedBlockingDeque<Packet> packetQueue;
 	
@@ -38,7 +37,7 @@ public class GameNetworkServer {
 		for (Packet packet : packetQueue) {
 			long currentTime = System.currentTimeMillis();
 			if (currentTime - packet.timestamp >= Config.SERVER_PING) {
-				server.sendToAllTCP(packet);
+				server.sendToAllUDP(packet);
 				packetQueue.remove(packet);
 			}
 		}

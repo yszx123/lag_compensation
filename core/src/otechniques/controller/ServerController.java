@@ -7,6 +7,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Vector2;
 
 import otechniques.Config;
+import otechniques.ObjectsConfig;
 import otechniques.ServerPart;
 import otechniques.network.server.GameNetworkServer;
 import otechniques.objects.GameWorld;
@@ -28,14 +29,7 @@ public class ServerController {
 	public void updateGamestate(ArrayList<Packet> receivedPackets) {
 
 		// process all new packets
-		for (Packet packet : receivedPackets) { // tak naprawde powinien
-												// dokonywac apdejtu stanu gry
-												// zaraz po przeczytaniu
-												// pakietu, a nie wtedy, gdy
-												// przeczyta WSZYSTKIE pakiety.
-												// Zaklada to, ze serwer jest w
-												// stanie przetworzyc wszystkie
-												// pakiety na czas
+		for (Packet packet : receivedPackets) {
 			lastProcessedRequest = packet.sequenceNumber;
 
 			if (packet instanceof InputPacket) {
@@ -52,7 +46,6 @@ public class ServerController {
 			server.addPacket(positionPacket);
 		}
 
-		
 		world.getWorld().step(Config.SERVER_PHYSICS_TIMESTEP, Config.VELOCITY_ITERATIONS, Config.POSITION_ITERATIONS);
 	}
 
@@ -60,13 +53,13 @@ public class ServerController {
 		Vector2 playerMovement = new Vector2();
 		for (int key : keysClicked) {
 			if (key == Keys.W) {
-				playerMovement.add(new Vector2(0, Config.PLAYER_SPEED));
+				playerMovement.add(new Vector2(0, ObjectsConfig.PLAYER_SPEED));
 			} else if (key == Keys.S) {
-				playerMovement.add(new Vector2(0, -Config.PLAYER_SPEED));
+				playerMovement.add(new Vector2(0, -ObjectsConfig.PLAYER_SPEED));
 			} else if (key == Keys.A) {
-				playerMovement.add(new Vector2(-Config.PLAYER_SPEED, 0));
+				playerMovement.add(new Vector2(-ObjectsConfig.PLAYER_SPEED, 0));
 			} else if (key == Keys.D) {
-				playerMovement.add(new Vector2(Config.PLAYER_SPEED, 0));
+				playerMovement.add(new Vector2(ObjectsConfig.PLAYER_SPEED, 0));
 			}
 		}
 		return playerMovement;

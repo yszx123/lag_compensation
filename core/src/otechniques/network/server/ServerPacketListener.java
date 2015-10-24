@@ -2,10 +2,10 @@ package otechniques.network.server;
 
 import java.util.concurrent.LinkedBlockingDeque;
 
-import otechniques.packets.Packet;
-
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
+
+import otechniques.packets.Packet;
 
 public class ServerPacketListener extends Listener {
 	private LinkedBlockingDeque<Packet> receivedPackets;

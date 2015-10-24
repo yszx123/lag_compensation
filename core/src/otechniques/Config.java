@@ -16,17 +16,23 @@ public class Config {
 	public static final float SERVER_PHYSICS_TIMESTEP = 1/60f;
 	public static final float SERVER_PHYSICS_TIMESTEP_MS = SERVER_PHYSICS_TIMESTEP * 1000;
 	
+	public static final short COLLISION_CATEGORY_PLAYER = 0x0001;  
+	public static final short COLLISION_CATEGORY_TRASH = 0x0002; 
+	public static final short COLLISION_CATEGORY_SCENERY = 0x0004;
+	public static final short COLLISION_MASK_TRASH = COLLISION_CATEGORY_TRASH | COLLISION_CATEGORY_SCENERY;
+	public static final short COLLISION_MASK_SCENERY = -1;
+	public static final short COLLISION_MASK_PLAYER = COLLISION_CATEGORY_SCENERY;
+	
 	public static final long CLIENT_PING = 200;	//latency in packets sending, in milliseconds
 	public static long SERVER_PING = 200;
-	public static final float POSITION_SENDING_FREQUENCY = 1/5f;
+	public static final float POSITION_SENDING_FREQUENCY = 1/60f;
 	
-	public static float PLAYER_BODY_SIZE =0.5f; //TODO zmienic na 0.5 i przeskalowac kamere
-	public static float PLAYER_SPEED = 10;
+
 	
 	public static final boolean SERVER_RECONCILIATION = true;
 	public static boolean CLIENT_SIDE_PREDICTION = true;
 
 	public static int CAMERA_VIEW_WIDTH = 40;	//zmiana tego nie daje zadnego efektu
-	public static int CAMERA_VIEW_HEIGHT = 80;
+	public static int CAMERA_VIEW_HEIGHT = 21;
 	
 }

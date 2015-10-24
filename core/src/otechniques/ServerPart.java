@@ -29,11 +29,6 @@ public class ServerPart {
 		controller.updateGamestate(server.getUnprocessedPackets());
 		server.sendPackets();
 	}
-			
-	//TODO krok czasu brany pod uwage przy kalkulacji fizyki
-	public void setTimestep(int timestep){
-		
-	}
 	
 	public void resize(int width, int height){
 		renderer.resize(width, height);
