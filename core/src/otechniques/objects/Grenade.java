@@ -23,7 +23,6 @@ public class Grenade extends GameObject {
 		super(world);
 		setParentBody(parentBody);
 		setBody(createBody(parentBody.getPosition()));
-
 		this.grenadeParticles = new Body[ObjectsConfig.GRENADE_FRAGS_COUNT];
 		this.isIgnited = isIgnited;
 		this.timeLeftToExplosion = ObjectsConfig.GRENADE_EXPLOSION_LATENCY;
@@ -38,7 +37,6 @@ public class Grenade extends GameObject {
 				for (Body body : grenadeParticles) {
 					world.destroyBody(body);
 				}
-
 				flaggedForDelete = true;
 			}
 		} else if (isIgnited) {
@@ -65,6 +63,7 @@ public class Grenade extends GameObject {
 					"Attempted to throw grenade, which is marked to be deleted or has already exploded");
 		}
 		
+
 		Vector2 directionVector = new Vector2(MathUtils.cos(parentBody.getAngle()), MathUtils.sin(parentBody.getAngle()));
 		body.applyLinearImpulse(directionVector.scl(ObjectsConfig.GRENADE_THROW_POWER), parentBody.getPosition(), true);
 	}

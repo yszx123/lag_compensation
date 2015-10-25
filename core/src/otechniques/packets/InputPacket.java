@@ -12,6 +12,7 @@ public class InputPacket extends Packet {
 	@SuppressWarnings("unused")
 	private InputPacket(){}
 	
+
 	public InputPacket(int senderID, long sequenceNumber, Integer[] keysPressed, Integer[] keysReleased, Vector2 inWorldMousePos, float delta) {
 		super(senderID, sequenceNumber);
 		this.keysPressed = keysPressed;

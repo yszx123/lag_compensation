@@ -9,7 +9,7 @@ public class ObjectsConfig {
 	public static final int GRENADE_FRAGS_COUNT = 60;
 	public static final float GRENADE_PARTICLE_LIVING_TIME = 1.1f;
 	public static final float GRENADE_THROW_POWER = 10f;
-	
+
 	
 	public static float PLAYER_BODY_SIZE =0.5f; 
 	public static float PLAYER_SPEED = 10;

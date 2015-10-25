@@ -65,11 +65,13 @@ public class ClientController extends CommonController {
 
 			getPlayerBody().setTransform(getPlayerBody().getPosition(),
 					calculateDesiredPlayerRotation(Renderer.getInWorldMousePosition()));
-		}
 
 		updateCommonGameState(timeStep);
 		inputHandler.refresh(); // TODO clears released keys
+	
+		}
 	}
+		
 
 	/**
 	 * applies player's input instantly, basing on currently pressed keys, not

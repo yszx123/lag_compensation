@@ -73,5 +73,6 @@ public abstract class CommonController {
 	
 	protected Body getPlayerBody() {
 		return gameWorld.getPlayer().body;
+
 	}
 }
