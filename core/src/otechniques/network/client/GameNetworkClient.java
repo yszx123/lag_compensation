@@ -54,9 +54,10 @@ public class GameNetworkClient {
 	 * @param keysPressed
 	 *            - list of keys currently pressed
 	 */
-	public void createInputPackets(Set<Integer> keysPressed) {
+	public void createInputPackets(Set<Integer> keysPressed, Set<Integer> keysReleased) {
 		Integer[] keysPressedArray = keysPressed.toArray(new Integer[keysPressed.size()]);
-		InputPacket packet = new InputPacket(clientId, ++lastSequenceNumber, keysPressedArray,
+		Integer[] keysReleasedArray = keysReleased.toArray(new Integer[keysReleased.size()]);
+		InputPacket packet = new InputPacket(clientId, ++lastSequenceNumber, keysPressedArray, keysReleasedArray,
 				Gdx.graphics.getDeltaTime());
 		packetsToSend.add(packet);
 	}

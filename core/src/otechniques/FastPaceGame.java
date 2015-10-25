@@ -26,10 +26,10 @@ public class FastPaceGame extends ApplicationAdapter {
 		
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		//left side of the screen
-		Gdx.gl.glViewport( 0, 0, Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight() );
+		//Gdx.gl.glViewport( 0, 0, Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight() );
 	    clientPart.renderGraphics(); 
 	    //right side
-	    Gdx.gl.glViewport( Gdx.graphics.getWidth()/2, 0, Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight() );
+	   // Gdx.gl.glViewport( Gdx.graphics.getWidth()/2, 0, Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight() );
 	    serverPart.renderGraphics();	
 	}
 	

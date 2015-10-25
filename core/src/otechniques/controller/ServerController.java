@@ -11,22 +11,23 @@ import otechniques.ObjectsConfig;
 import otechniques.ServerPart;
 import otechniques.network.server.GameNetworkServer;
 import otechniques.objects.GameWorld;
+import otechniques.objects.Grenade;
 import otechniques.packets.InputPacket;
 import otechniques.packets.Packet;
 import otechniques.packets.PlayerPositionPacket;
 
-public class ServerController {
-	private final GameWorld world;
+public class ServerController extends CommonController{
 	private final GameNetworkServer server;
 	private long lastProcessedRequest;
+	private ArrayList<Grenade> objects = new ArrayList<>();
 	float delta;
 
-	public ServerController(GameWorld world, GameNetworkServer server) {
-		this.world = world;
+	public ServerController(GameWorld gameWorld, GameNetworkServer server) {
+		super(gameWorld);
 		this.server = server;
 	}
 
-	public void updateGamestate(ArrayList<Packet> receivedPackets) {
+	public void updateGamestate(ArrayList<Packet> receivedPackets, float timestep) {
 
 		// process all new packets
 		for (Packet packet : receivedPackets) {
@@ -34,7 +35,7 @@ public class ServerController {
 
 			if (packet instanceof InputPacket) {
 				InputPacket p = (InputPacket) packet;
-				world.getPlayer().body.setLinearVelocity(calculateMovementVector(p.keysClicked));
+				processInputPacket(p);
 			} // else if...
 
 		}
@@ -42,11 +43,11 @@ public class ServerController {
 		if (delta >= Config.POSITION_SENDING_FREQUENCY) {
 			delta -= Config.POSITION_SENDING_FREQUENCY;
 			PlayerPositionPacket positionPacket = new PlayerPositionPacket(ServerPart.SERVER_ID, lastProcessedRequest,
-					world.getPlayer().getPosition().x, world.getPlayer().getPosition().y);
+					gameWorld.getPlayer().getPosition().x, gameWorld.getPlayer().getPosition().y);
 			server.addPacket(positionPacket);
 		}
 
-		world.getWorld().step(Config.SERVER_PHYSICS_TIMESTEP, Config.VELOCITY_ITERATIONS, Config.POSITION_ITERATIONS);
+		updateCommonGameState(timestep);
 	}
 
 	private Vector2 calculateMovementVector(Integer[] keysClicked) {
@@ -63,5 +64,16 @@ public class ServerController {
 			}
 		}
 		return playerMovement;
+	}
+	
+	private void processInputPacket(InputPacket p){
+		gameWorld.getPlayer().body.setLinearVelocity(calculateMovementVector(p.keysPressed));
+		
+		for (int key : p.keysReleased) {
+			if(key == Keys.G){
+				throwGrenade();
+			}
+		}
+
 	}
 }

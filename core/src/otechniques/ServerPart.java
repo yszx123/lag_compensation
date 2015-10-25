@@ -26,7 +26,7 @@ public class ServerPart {
 	}
 	
 	public void processServerSide(){
-		controller.updateGamestate(server.getUnprocessedPackets());
+		controller.updateGamestate(server.getUnprocessedPackets(), Config.PHYSICS_TIMESTEP);
 		server.sendPackets();
 	}
 	

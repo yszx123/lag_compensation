@@ -12,9 +12,8 @@ public class Config {
 	public static final int VELOCITY_ITERATIONS = 8;
 	public static final int POSITION_ITERATIONS = 3;
 	
-	public static final float CLIENT_PHYSICIS_TIMESTEP = 1/60f;	
-	public static final float SERVER_PHYSICS_TIMESTEP = 1/60f;
-	public static final float SERVER_PHYSICS_TIMESTEP_MS = SERVER_PHYSICS_TIMESTEP * 1000;
+	public static final float PHYSICS_TIMESTEP = 1/60f;
+	public static final float PHYSICS_TIMESTEP_MS = PHYSICS_TIMESTEP * 1000;
 	
 	public static final short COLLISION_CATEGORY_PLAYER = 0x0001;  
 	public static final short COLLISION_CATEGORY_TRASH = 0x0002; 
@@ -32,7 +31,7 @@ public class Config {
 	public static final boolean SERVER_RECONCILIATION = true;
 	public static boolean CLIENT_SIDE_PREDICTION = true;
 
-	public static int CAMERA_VIEW_WIDTH = 40;	//zmiana tego nie daje zadnego efektu
-	public static int CAMERA_VIEW_HEIGHT = 21;
+	public static int CAMERA_VIEW_WIDTH = 20;	//zmiana tego nie daje zadnego efektu
+	public static int CAMERA_VIEW_HEIGHT = 20;
 	
 }
