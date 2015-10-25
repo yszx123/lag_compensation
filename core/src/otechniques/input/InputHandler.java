@@ -28,14 +28,7 @@ public class InputHandler extends InputAdapter {
 		keysReleased.add(keycode);
 		return true;
 	}
-
-	@Override
-	public boolean mouseMoved(int screenX, int screenY) {
-		// Vector3 mousePosition = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
-		// scheduler.addPacket(new MousePositionPacket(mousePosition));
-		return false;
-	}
-
+	
 	public Set<Integer> getKeysPressed() {
 		return keysPressed;
 	}

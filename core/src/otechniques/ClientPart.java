@@ -34,7 +34,7 @@ public class ClientPart {
 	}
 	
 	public void processClientSide(){
-		controller.updateGameState(Config.CLIENT_PHYSICIS_TIMESTEP);	//TODO timestep
+		controller.updateGameState(Config.PHYSICS_TIMESTEP);
 		networkClient.sendPackets();
 	}
 	

@@ -6,11 +6,13 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryonet.Client;
 
 import otechniques.Config;
 import otechniques.packets.InputPacket;
 import otechniques.packets.Packet;
+import otechniques.render.Renderer;
 
 public class GameNetworkClient {
 	private int clientId;
@@ -54,10 +56,12 @@ public class GameNetworkClient {
 	 * @param keysPressed
 	 *            - list of keys currently pressed
 	 */
-	public void createInputPackets(Set<Integer> keysPressed) {
+	public void createInputPackets(Set<Integer> keysPressed, Set<Integer> keysReleased) {
 		Integer[] keysPressedArray = keysPressed.toArray(new Integer[keysPressed.size()]);
-		InputPacket packet = new InputPacket(clientId, ++lastSequenceNumber, keysPressedArray,
-				Gdx.graphics.getDeltaTime());
+		Integer[] keysReleasedArray = keysReleased.toArray(new Integer[keysReleased.size()]);
+		Vector2 inWorldMousePos = Renderer.getInWorldMousePosition();
+		InputPacket packet = new InputPacket(clientId, ++lastSequenceNumber, keysPressedArray, keysReleasedArray,
+				inWorldMousePos, Gdx.graphics.getDeltaTime());
 		packetsToSend.add(packet);
 	}
 

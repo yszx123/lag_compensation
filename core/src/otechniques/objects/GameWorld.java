@@ -1,5 +1,6 @@
 package otechniques.objects;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -16,7 +17,7 @@ public class GameWorld {
 
 	public GameWorld() {
 		world = new World(new Vector2(), true);
-		player = new Player(0, 0, world);
+		player = new Player(10, 10, world);
 		createWalls();
 	}
 
@@ -42,13 +43,13 @@ public class GameWorld {
 		fixtureDef.filter.categoryBits = Config.COLLISION_CATEGORY_SCENERY;
 		fixtureDef.filter.maskBits = Config.COLLISION_MASK_SCENERY;
 
-		wallShape.setAsBox(10, 0.1f, new Vector2(0, -10f), 0);
+		wallShape.setAsBox(10, 0.1f, new Vector2(10, 20f), 0);
 		wallBody.createFixture(fixtureDef);
-		wallShape.setAsBox(10, 0.1f, new Vector2(0, 10f), 0);
+		wallShape.setAsBox(10, 0.1f, new Vector2(10, 0f), 0);
 		wallBody.createFixture(fixtureDef);
-		wallShape.setAsBox(10, 0.1f, new Vector2(10, 0f), (float) Math.PI / 2f);
+		wallShape.setAsBox(10, 0.1f, new Vector2(0, 10f), MathUtils.PI / 2f);
 		wallBody.createFixture(fixtureDef);
-		wallShape.setAsBox(10, 0.1f, new Vector2(-10f, 0f), (float) Math.PI / 2f);
+		wallShape.setAsBox(10, 0.1f, new Vector2(20f, 10f), MathUtils.PI / 2f);
 		wallBody.createFixture(fixtureDef);
 
 		wallShape.dispose();

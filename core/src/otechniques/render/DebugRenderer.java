@@ -10,13 +10,14 @@ public class DebugRenderer extends Renderer{
 	
 	public DebugRenderer(World world) {
 		super();
-        camera.position.set(0,0,0); 
 		this.world = world;
 		renderer.setDrawVelocities(true);
 	}
 	
 	public void render() {
-		renderer.render(world, camera.combined);
+		camera.position.set(10, 10, 0);
+		camera.update();
+		renderer.render(world, camera.combined);		
 	}
 	
 }

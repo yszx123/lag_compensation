@@ -5,19 +5,13 @@ import com.badlogic.gdx.physics.box2d.World;
 
 public abstract class GameObject {
 
-	protected boolean isAlive;
+	protected boolean flaggedForDelete;
 	protected World world;
 	protected Body body;
 	protected Body parentBody;
 
 	protected GameObject(World world) {
 		this.world = world;
-		this.isAlive = true;
-	}
-
-	protected void dispose() {
-		world.destroyBody(body);
-		isAlive = false;
 	}
 
 	protected void setBody(Body body) {
@@ -26,8 +20,8 @@ public abstract class GameObject {
 
 	public abstract void act(float deltaTime);
 
-	public boolean isAlive() {
-		return isAlive;
+	public boolean isFlaggedForDelete() {
+		return flaggedForDelete;
 	}
 
 	public Body getParentBody() {
