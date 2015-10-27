@@ -8,16 +8,16 @@ import com.badlogic.gdx.math.Vector2;
 
 import otechniques.Config;
 import otechniques.ObjectsConfig;
-import otechniques.ServerPart;
 import otechniques.network.server.GameNetworkServer;
 import otechniques.objects.GameWorld;
 import otechniques.objects.Grenade;
+import otechniques.objects.Player;
 import otechniques.packets.InputPacket;
+import otechniques.packets.MousePositionPacket;
 import otechniques.packets.Packet;
 import otechniques.packets.PlayerPositionPacket;
-import otechniques.render.Renderer;
 
-public class ServerController extends CommonController{
+public class ServerController extends CommonController {
 	private final GameNetworkServer server;
 	private long lastProcessedRequest;
 	private ArrayList<Grenade> objects = new ArrayList<>();
@@ -37,15 +37,23 @@ public class ServerController extends CommonController{
 			if (packet instanceof InputPacket) {
 				InputPacket p = (InputPacket) packet;
 				processInputPacket(p);
-			} // else if...
+			} else if (packet instanceof MousePositionPacket) {
+				MousePositionPacket p = (MousePositionPacket) packet;
+				processMousePositionPacket(p);
+			}
 
 		}
 		delta += Gdx.graphics.getDeltaTime();
 		if (delta >= Config.POSITION_SENDING_FREQUENCY) {
 			delta -= Config.POSITION_SENDING_FREQUENCY;
-			PlayerPositionPacket positionPacket = new PlayerPositionPacket(ServerPart.SERVER_ID, lastProcessedRequest,
-					gameWorld.getPlayer().getPosition().x, gameWorld.getPlayer().getPosition().y);
-			server.addPacket(positionPacket);
+			
+			//TODO tu moze byc blad
+			for (Player player : gameWorld.getPlayers().values()) {
+				PlayerPositionPacket positionPacket = new PlayerPositionPacket(Config.SERVER_ID, player.getId(),
+						lastProcessedRequest, player.getPosition().x,
+						player.getPosition().y);
+				server.addPacket(positionPacket);
+			}
 		}
 
 		updateCommonGameState(timestep);
@@ -66,18 +74,22 @@ public class ServerController extends CommonController{
 		}
 		return playerMovement;
 	}
-	
-	private void processInputPacket(InputPacket p){
-		gameWorld.getPlayer().body.setLinearVelocity(calculateMovementVector(p.keysPressed));
-		
-		getPlayerBody().setTransform(getPlayerBody().getPosition(),
-				calculateDesiredPlayerRotation(Renderer.getInWorldMousePosition()));
-		
+
+	private void processInputPacket(InputPacket p) {
+		gameWorld.getPlayer(p.playerId).body.setLinearVelocity(calculateMovementVector(p.keysPressed));
+
+		getPlayerBody(p.playerId).setTransform(getPlayerBody(p.playerId).getPosition(),
+				getPlayerBody(p.playerId).getAngle());
+
 		for (int key : p.keysReleased) {
-			if(key == Keys.G){
-				throwGrenade();
+			if (key == Keys.G) {
+				throwGrenade(p.playerId);
 			}
 		}
+	}
 
+	private void processMousePositionPacket(MousePositionPacket p) {
+		getPlayerBody(p.playerId).setTransform(getPlayerBody(p.playerId).getPosition(),
+				calculateDesiredPlayerRotation(p.playerId, p.inWorldMousePos));
 	}
 }

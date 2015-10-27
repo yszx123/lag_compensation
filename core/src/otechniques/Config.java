@@ -1,6 +1,9 @@
 package otechniques;
 
 public class Config {
+	public static final int SERVER_ID = 0;
+	public static final int CONTROLLABLE_PLAYER_ID = 1;
+	
 	public static final int TCP_PORT = 54555;
 	public static final int UDP_PORT = 54777;
 
@@ -29,6 +32,9 @@ public class Config {
 
 	
 	public static final boolean SERVER_RECONCILIATION = true;
+
+
+
 	public static boolean CLIENT_SIDE_PREDICTION = true;
 
 	public static int CAMERA_VIEW_WIDTH = 20;	

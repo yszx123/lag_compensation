@@ -17,13 +17,15 @@ import otechniques.render.Renderer;
 import otechniques.utils.DeltaMovement;
 
 public class ClientController extends CommonController {
+	private final int playerId;
 	private final GameNetworkClient client;
 	private final InputHandler inputHandler;
 	private final ArrayList<DeltaMovement> deltaMovements;
 	private final ArrayList<Trash> trashObjects;
 
-	public ClientController(GameWorld gameWorld, GameNetworkClient client, InputHandler inputHandler) {
+	public ClientController(int playerId, GameWorld gameWorld, GameNetworkClient client, InputHandler inputHandler) {
 		super(gameWorld);
+		this.playerId = playerId;
 		this.client = client;
 		this.inputHandler = inputHandler;
 		deltaMovements = new ArrayList<>();
@@ -62,9 +64,11 @@ public class ClientController extends CommonController {
 			if (inputHandler.getKeysReleased().contains(Keys.G)) {
 				throwGrenade();
 			}
-
-			getPlayerBody().setTransform(getPlayerBody().getPosition(),
-					calculateDesiredPlayerRotation(Renderer.getInWorldMousePosition()));
+			
+			if(playerId == Config.CONTROLLABLE_PLAYER_ID ){	//apply rotation only for controllable player
+				getPlayerBody(playerId).setTransform(getPlayerBody(playerId).getPosition(),
+						calculateDesiredPlayerRotation(playerId, Renderer.getInWorldMousePosition()));
+			}
 
 		updateCommonGameState(timeStep);
 		inputHandler.refresh(); // TODO clears released keys
@@ -78,11 +82,11 @@ public class ClientController extends CommonController {
 	 * waiting for server acknowledgment
 	 */
 	private void appplyRecentMovementInput() {
-		getPlayerBody().setLinearVelocity(calculateMovementVector(inputHandler.getKeysPressed()));
+		getPlayerBody(playerId).setLinearVelocity(calculateMovementVector(inputHandler.getKeysPressed()));
 	}
 
 	private void calculatePlayerPosition(PlayerPositionPacket positionPacket) {
-		gameWorld.getPlayer().setPosition(positionPacket.x, positionPacket.y);
+		getPlayerBody(playerId).setTransform(positionPacket.x, positionPacket.y, getPlayerBody(playerId).getAngle());
 
 		if (Config.SERVER_RECONCILIATION) {
 
@@ -93,8 +97,8 @@ public class ClientController extends CommonController {
 					deltaMovements.remove(i);
 				} else {
 					DeltaMovement d = deltaMovements.get(i);
-					getPlayerBody().setTransform(getPlayerBody().getPosition().add(d.deltaMovement),
-							getPlayerBody().getAngle());
+					getPlayerBody(playerId).setTransform(getPlayerBody(playerId).getPosition().add(d.deltaMovement),
+							getPlayerBody(playerId).getAngle());
 				}
 			}
 		} else {

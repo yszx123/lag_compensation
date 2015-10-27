@@ -1,5 +1,8 @@
 package otechniques.objects;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -12,19 +15,22 @@ import com.badlogic.gdx.physics.box2d.World;
 import otechniques.Config;
 
 public class GameWorld {
-	private Player player;
+	private Map<Integer, Player> players = new HashMap<>();
 	private World world;
 
 	public GameWorld() {
 		world = new World(new Vector2(), true);
-		player = new Player(10, 10, world);
 		createWalls();
 	}
 
-	public Player getPlayer() {
-		return player;
+	public Player getPlayer(int id) {
+		return players.get(id);
 	}
 
+	public Map<Integer, Player> getPlayers(){
+		return players;
+	}
+	
 	public World getWorld() {
 		return world;
 	}
@@ -53,6 +59,10 @@ public class GameWorld {
 		wallBody.createFixture(fixtureDef);
 
 		wallShape.dispose();
+	}
+	
+	public void createPlayer(int playerId){
+		players.put(playerId, new Player(playerId, 10+playerId, 10-playerId, world)); //TODO dwoch playerow w jednym miejscu
 	}
 
 }

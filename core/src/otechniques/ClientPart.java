@@ -15,20 +15,20 @@ public class ClientPart {
 	private GameNetworkClient networkClient;
 	private GameWorld gameWorld;
 	
-	public final int CLIENT_ID;
+	public final int clientId;
 	
 	public ClientPart(int clientId){
-		this.CLIENT_ID = clientId;
+		this.clientId = clientId;
 		
-		networkClient = new GameNetworkClient();
-		networkClient.setClientId(clientId);
+		networkClient = new GameNetworkClient(clientId);
 		
 		gameWorld = new GameWorld();
+		gameWorld.createPlayer(clientId);
 		
 		inputHandler = new InputHandler();
 		inputHandler.setupInputHandler();
 		
-		controller = new ClientController(gameWorld, networkClient, inputHandler);
+		controller = new ClientController(clientId, gameWorld, networkClient, inputHandler);
 		
 		renderer = Config.DEBUG_RENDER ? new DebugRenderer(gameWorld.getWorld()) : new StandardRenderer(gameWorld);
 	}
@@ -44,6 +44,10 @@ public class ClientPart {
 	
 	public void resize(int width, int height){
 		renderer.resize(width, height);
+	}
+	
+	public void dispose(){
+		gameWorld.getWorld().dispose();
 	}
 }
  

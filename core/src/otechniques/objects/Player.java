@@ -11,9 +11,12 @@ import otechniques.Config;
 import otechniques.ObjectsConfig;
 
 public class Player {
-	public Body body;
+	public final Body body;
+	private final int id;
 
-	public Player(float x, float y, World world) {
+	public Player(int id, float x, float y, World world) {
+		this.id = id;
+		
 		BodyDef bodyDef = new BodyDef();
 		bodyDef.type = BodyDef.BodyType.DynamicBody;
 		bodyDef.position.set(x, y);
@@ -34,16 +37,12 @@ public class Player {
 
 	}
 
-	public void setPosition(Vector2 pos) {
-		body.setTransform(pos, body.getAngle());
-	}
-
-	public void setPosition(float x, float y) {
-		body.setTransform(new Vector2(x, y), body.getAngle());
-	}
-
 	public Vector2 getPosition() {
 		return body.getPosition();
+	}
+	
+	public int getId(){
+		return id;
 	}
 
 }

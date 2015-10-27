@@ -17,14 +17,14 @@ import otechniques.objects.Grenade;
 public abstract class CommonController {
 	protected final GameWorld gameWorld;
 	protected final ArrayList<Grenade> objects;
-	
+
 	public CommonController(GameWorld gameWorld) {
 		this.gameWorld = gameWorld;
 		objects = new ArrayList<>();
 	}
-	
-	protected void updateCommonGameState(float timeStep){
-		
+
+	protected void updateCommonGameState(float timeStep) {
+
 		for (Iterator<Grenade> iterator = objects.iterator(); iterator.hasNext();) {
 			Grenade g = iterator.next();
 			if (g.isFlaggedForDelete()) {
@@ -35,7 +35,7 @@ public abstract class CommonController {
 		}
 		gameWorld.getWorld().step(Config.PHYSICS_TIMESTEP, Config.VELOCITY_ITERATIONS, Config.POSITION_ITERATIONS);
 	}
-		
+
 	/**
 	 * @return vector representing player's movement direction
 	 */
@@ -56,23 +56,29 @@ public abstract class CommonController {
 		}
 		return playerMovement;
 	}
-	
-	protected void throwGrenade(){ //TODO nie powinno tak byc- powinno sie uzyc jedynie funkcji granatu
-		Grenade g = new Grenade(gameWorld.getWorld(), gameWorld.getPlayer().body, true);
+
+	protected void throwGrenade() {
+		throwGrenade(0);
+	}
+
+	protected void throwGrenade(int playerId) { // TODO nie powinno tak byc-
+												// powinno sie uzyc jedynie
+												// funkcji granatu
+		Grenade g = new Grenade(gameWorld.getWorld(), gameWorld.getPlayer(playerId).body, true);
 		objects.add(g);
 		g.throwGrenade();
 	}
-	
-	protected float calculateDesiredPlayerRotation(Vector2 mousePos){
-		float playerY = gameWorld.getPlayer().body.getPosition().y;
-		float playerX = gameWorld.getPlayer().body.getPosition().x;
-		
+
+	protected float calculateDesiredPlayerRotation(int clientId, Vector2 mousePos) {
+		float playerY = gameWorld.getPlayer(clientId).body.getPosition().y;
+		float playerX = gameWorld.getPlayer(clientId).body.getPosition().x;
+
 		float desiredAngle = MathUtils.atan2(mousePos.y - playerY, mousePos.x - playerX);
 		return desiredAngle;
 	}
-	
-	protected Body getPlayerBody() {
-		return gameWorld.getPlayer().body;
 
+	protected Body getPlayerBody(int id) {
+		return gameWorld.getPlayer(id).body;
 	}
+
 }

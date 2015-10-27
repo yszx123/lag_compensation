@@ -11,12 +11,11 @@ public class ServerPart {
 	GameNetworkServer server;
 	ServerController controller;
 	Renderer renderer;
-	
-	public static final int SERVER_ID = 0; //TODO przeniesc
-	
+	GameWorld gameWorld;
+		
 	public ServerPart(){		
 		server = new GameNetworkServer();
-		GameWorld gameWorld = new GameWorld(); 
+		gameWorld = new GameWorld(); 	
 		controller = new ServerController(gameWorld, server);
 		renderer = Config.DEBUG_RENDER ? new DebugRenderer(gameWorld.getWorld()) : new StandardRenderer(gameWorld);
 	}
@@ -32,5 +31,17 @@ public class ServerPart {
 	
 	public void resize(int width, int height){
 		renderer.resize(width, height);
+	}
+	
+	public void dispose(){
+		gameWorld.getWorld().dispose();
+	}
+	
+	public void addClient(int clientId){
+		gameWorld.createPlayer(clientId);
+	}
+	
+	public void removeClient(int clientId){
+		//TODO dokonczyc
 	}
 }

@@ -11,11 +11,12 @@ import com.esotericsoftware.kryonet.Client;
 
 import otechniques.Config;
 import otechniques.packets.InputPacket;
+import otechniques.packets.MousePositionPacket;
 import otechniques.packets.Packet;
 import otechniques.render.Renderer;
 
 public class GameNetworkClient {
-	private int clientId;
+	private final int clientId;
 	private Client client;
 	/**
 	 * queue simulating ping
@@ -24,7 +25,9 @@ public class GameNetworkClient {
 	private ConcurrentLinkedQueue<Packet> receivedPackets;
 	private long lastSequenceNumber;
 
-	public GameNetworkClient() {
+	public GameNetworkClient(int clientId) {
+		this.clientId = clientId;
+
 		client = new Client();
 		packetsToSend = new LinkedList<>();
 		receivedPackets = new ConcurrentLinkedQueue<>();
@@ -53,16 +56,21 @@ public class GameNetworkClient {
 	 * being sent to the server, basing on list of currently pressed keys. Sent
 	 * packets wait for acknowledgment from server.
 	 * 
-	 * @param keysPressed
-	 *            - list of keys currently pressed
 	 */
 	public void createInputPackets(Set<Integer> keysPressed, Set<Integer> keysReleased) {
 		Integer[] keysPressedArray = keysPressed.toArray(new Integer[keysPressed.size()]);
 		Integer[] keysReleasedArray = keysReleased.toArray(new Integer[keysReleased.size()]);
-		Vector2 inWorldMousePos = Renderer.getInWorldMousePosition();
-		InputPacket packet = new InputPacket(clientId, ++lastSequenceNumber, keysPressedArray, keysReleasedArray,
-				inWorldMousePos, Gdx.graphics.getDeltaTime());
+		InputPacket packet = new InputPacket(clientId, clientId, ++lastSequenceNumber, keysPressedArray,
+				keysReleasedArray, Gdx.graphics.getDeltaTime());
 		packetsToSend.add(packet);
+		
+		//mouse position is sent only for controllable player
+		if(clientId == Config.CONTROLLABLE_PLAYER_ID){
+			Vector2 inWorldMousePos = Renderer.getInWorldMousePosition();
+			MousePositionPacket p = new MousePositionPacket(clientId, clientId, lastSequenceNumber, inWorldMousePos);
+			packetsToSend.add(p);
+		}
+		
 	}
 
 	public ConcurrentLinkedQueue<Packet> getReceivedPackets() {
@@ -77,12 +85,16 @@ public class GameNetworkClient {
 		}
 	}
 
-	public void setClientId(int clientId) {
-		this.clientId = clientId;
-	}
-
 	public long getLastSequenceNumber() {
 		return lastSequenceNumber;
+	}
+
+	public void dispose() {
+		try {
+			client.dispose();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
