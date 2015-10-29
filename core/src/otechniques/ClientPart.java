@@ -14,40 +14,43 @@ public class ClientPart {
 	private ClientController controller;
 	private GameNetworkClient networkClient;
 	private GameWorld gameWorld;
-	
+
 	public final int clientId;
-	
-	public ClientPart(int clientId){
+	public final boolean isClientControllable;
+
+	public ClientPart(int clientId, boolean isClientControllable) {
 		this.clientId = clientId;
-		
+		this.isClientControllable = isClientControllable;
+
 		networkClient = new GameNetworkClient(clientId);
-		
+
 		gameWorld = new GameWorld();
 		gameWorld.createPlayer(clientId);
-		
+
 		inputHandler = new InputHandler();
-		inputHandler.setupInputHandler();
-		
-		controller = new ClientController(clientId, gameWorld, networkClient, inputHandler);
-		
+		if(isClientControllable){		
+			inputHandler.setupInputHandler();
+		}
+
+		controller = new ClientController(clientId, isClientControllable, gameWorld, networkClient, inputHandler);
+
 		renderer = Config.DEBUG_RENDER ? new DebugRenderer(gameWorld.getWorld()) : new StandardRenderer(gameWorld);
 	}
-	
-	public void processClientSide(){
+
+	public void processClientSide() {
 		controller.updateGameState(Config.PHYSICS_TIMESTEP);
 		networkClient.sendPackets();
 	}
-	
-	public void renderGraphics(){
+
+	public void renderGraphics() {
 		renderer.render();
 	}
-	
-	public void resize(int width, int height){
+
+	public void resize(int width, int height) {
 		renderer.resize(width, height);
 	}
-	
-	public void dispose(){
+
+	public void dispose() {
 		gameWorld.getWorld().dispose();
 	}
 }
- 

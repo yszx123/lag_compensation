@@ -2,7 +2,6 @@ package otechniques;
 
 public class Config {
 	public static final int SERVER_ID = 0;
-	public static final int CONTROLLABLE_PLAYER_ID = 1;
 	
 	public static final int TCP_PORT = 54555;
 	public static final int UDP_PORT = 54777;

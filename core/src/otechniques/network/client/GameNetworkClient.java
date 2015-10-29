@@ -62,15 +62,14 @@ public class GameNetworkClient {
 		Integer[] keysReleasedArray = keysReleased.toArray(new Integer[keysReleased.size()]);
 		InputPacket packet = new InputPacket(clientId, clientId, ++lastSequenceNumber, keysPressedArray,
 				keysReleasedArray, Gdx.graphics.getDeltaTime());
+		
 		packetsToSend.add(packet);
-		
-		//mouse position is sent only for controllable player
-		if(clientId == Config.CONTROLLABLE_PLAYER_ID){
-			Vector2 inWorldMousePos = Renderer.getInWorldMousePosition();
-			MousePositionPacket p = new MousePositionPacket(clientId, clientId, lastSequenceNumber, inWorldMousePos);
-			packetsToSend.add(p);
-		}
-		
+	}
+
+	public void createMousePositionPackets() {
+		Vector2 inWorldMousePos = Renderer.getInWorldMousePosition();
+		MousePositionPacket p = new MousePositionPacket(clientId, clientId, lastSequenceNumber, inWorldMousePos);
+		packetsToSend.add(p);
 	}
 
 	public ConcurrentLinkedQueue<Packet> getReceivedPackets() {

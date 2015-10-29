@@ -18,14 +18,17 @@ import otechniques.utils.DeltaMovement;
 
 public class ClientController extends CommonController {
 	private final int playerId;
+	private final boolean isClientControllable;
 	private final GameNetworkClient client;
 	private final InputHandler inputHandler;
 	private final ArrayList<DeltaMovement> deltaMovements;
 	private final ArrayList<Trash> trashObjects;
 
-	public ClientController(int playerId, GameWorld gameWorld, GameNetworkClient client, InputHandler inputHandler) {
+	public ClientController(int playerId, boolean isClientControllable, GameWorld gameWorld, GameNetworkClient client,
+			InputHandler inputHandler) {
 		super(gameWorld);
 		this.playerId = playerId;
+		this.isClientControllable = isClientControllable;
 		this.client = client;
 		this.inputHandler = inputHandler;
 		deltaMovements = new ArrayList<>();
@@ -40,13 +43,17 @@ public class ClientController extends CommonController {
 		// server state
 		while (client.getReceivedPackets().size() != 0) {
 			Packet packet = client.getReceivedPackets().remove();
-			if (packet instanceof PlayerPositionPacket) {
+			if (packet instanceof PlayerPositionPacket && packet.playerId == this.playerId) { //TODO w ogole takiego pakietu nie powinien otrzymac
 				calculatePlayerPosition((PlayerPositionPacket) packet);
 			} // else if(...)
 
 		}
 
-		client.createInputPackets(inputHandler.getKeysPressed(), inputHandler.getKeysReleased());
+		
+		if(isClientControllable){
+			client.createInputPackets(inputHandler.getKeysPressed(), inputHandler.getKeysReleased());
+			client.createMousePositionPackets();
+		}
 
 		for (Trash trash : trashObjects) {
 			trash.act(timeStep);
@@ -62,20 +69,20 @@ public class ClientController extends CommonController {
 
 			// grenades
 			if (inputHandler.getKeysReleased().contains(Keys.G)) {
-				throwGrenade();
+				throwGrenade(playerId);
 			}
 			
-			if(playerId == Config.CONTROLLABLE_PLAYER_ID ){	//apply rotation only for controllable player
+			
+			if (isClientControllable) { // apply rotation only for controllable player
 				getPlayerBody(playerId).setTransform(getPlayerBody(playerId).getPosition(),
 						calculateDesiredPlayerRotation(playerId, Renderer.getInWorldMousePosition()));
 			}
 
-		updateCommonGameState(timeStep);
-		inputHandler.refresh(); // TODO clears released keys
-	
+			updateCommonGameState(timeStep);
+			inputHandler.refresh(); // TODO clears released keys
+
 		}
 	}
-		
 
 	/**
 	 * applies player's input instantly, basing on currently pressed keys, not

@@ -57,10 +57,6 @@ public abstract class CommonController {
 		return playerMovement;
 	}
 
-	protected void throwGrenade() {
-		throwGrenade(0);
-	}
-
 	protected void throwGrenade(int playerId) { // TODO nie powinno tak byc-
 												// powinno sie uzyc jedynie
 												// funkcji granatu
