@@ -1,6 +1,10 @@
 package otechniques;
 
+import java.util.UUID;
+
 public class Config {
+	public static final String runId = UUID.randomUUID().toString();
+	
 	public static final int SERVER_ID = 0;
 	
 	public static final int TCP_PORT = 54555;
@@ -26,15 +30,15 @@ public class Config {
 	
 	public static final long CLIENT_PING = 200;	//latency in packets sending, in milliseconds
 	public static long SERVER_PING = 200;
-	public static final float POSITION_SENDING_FREQUENCY = 1/60f;
+	public static final float PLAYER_STATE_SENDING_FREQUENCY = 1/60f;
 	
 
 	
-	public static final boolean SERVER_RECONCILIATION = true;
+	public static final boolean SERVER_RECONCILIATION = false;
 
 
 
-	public static boolean CLIENT_SIDE_PREDICTION = true;
+	public static boolean CLIENT_SIDE_PREDICTION = false;
 
 	public static int CAMERA_VIEW_WIDTH = 20;	
 	public static int CAMERA_VIEW_HEIGHT = 20;

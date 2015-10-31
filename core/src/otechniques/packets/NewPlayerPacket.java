@@ -1,13 +1,16 @@
 package otechniques.packets;
 
-public class NewPlayerPacket {
+import java.util.UUID;
+
+public class NewPlayerPacket extends ControlPacket{
 	
 	public int playerId;
 	
 	@SuppressWarnings("unused")
-	private NewPlayerPacket(){};
+	private NewPlayerPacket(){}
 	
-	public NewPlayerPacket(int playerId){
+	public NewPlayerPacket(String programRunId, int playerId){
+		super(programRunId);
 		this.playerId = playerId;
 	}
 }	

@@ -7,6 +7,8 @@ import java.util.concurrent.LinkedBlockingDeque;
 import com.esotericsoftware.kryonet.Server;
 
 import otechniques.Config;
+import otechniques.network.ControlPacketListener;
+import otechniques.packets.ControlPacket;
 import otechniques.packets.Packet;
 
 /**
@@ -18,23 +20,27 @@ import otechniques.packets.Packet;
  *
  */
 public class GameNetworkServer {
-	Server server;
+	Server server = new Server();
 
-	private LinkedBlockingDeque<Packet> receivedPackets;
-	private LinkedBlockingDeque<Packet> packetQueue;
+	private LinkedBlockingDeque<Packet> receivedPackets = new LinkedBlockingDeque<>();;
+	private LinkedBlockingDeque<ControlPacket> receivedControlPackets = new LinkedBlockingDeque<>();;
+	private LinkedBlockingDeque<Packet> packetQueue = new LinkedBlockingDeque<>();;
+	private LinkedBlockingDeque<ControlPacket> controlPacketQueue = new LinkedBlockingDeque<>();;
 
 	public GameNetworkServer() {
-		receivedPackets = new LinkedBlockingDeque<>();
-		server = new Server();
-		packetQueue = new LinkedBlockingDeque<Packet>();
-
 		Packet.registerClasses(server);
+
 		server.start();
+		server.addListener(new ControlPacketListener(receivedControlPackets));
 		server.addListener(new ServerPacketListener(receivedPackets));
 		tryToBind();
 	}
 
 	public void sendPackets() { // TODO poprawic te metode na lepsza wydajnosc
+		for (ControlPacket controlPacket : controlPacketQueue) {
+			server.sendToAllTCP(controlPacket);
+		}
+		
 		for (Packet packet : packetQueue) {
 			long currentTime = System.currentTimeMillis();
 			if (currentTime - packet.timestamp >= Config.SERVER_PING) {
@@ -48,13 +54,13 @@ public class GameNetworkServer {
 		packetQueue.add(p);
 	}
 
-	public ArrayList<Packet> getUnprocessedPackets() {
+	public ArrayList<Packet> getUnprocessedGamestatePackets() {
 		Packet packet;
 		ArrayList<Packet> unprocessedPackets = new ArrayList<>(
 				// its assumed, that some (possibly not more than buffer size)
 				// packets may arrive during copying
 				receivedPackets.size() + Config.SERVER_PACKET_BUFFER_SIZE);
-		
+
 		while ((packet = receivedPackets.poll()) != null) {
 			unprocessedPackets.add(packet);
 		}
@@ -78,4 +84,11 @@ public class GameNetworkServer {
 		}
 	}
 
+	public LinkedBlockingDeque<ControlPacket> getUnprocessedControlPackets() {
+		return receivedControlPackets;
+	}
+
+	public void addControlPacket(ControlPacket packet) {
+		controlPacketQueue.add(packet);
+	}
 }

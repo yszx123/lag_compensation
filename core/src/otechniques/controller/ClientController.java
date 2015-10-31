@@ -12,7 +12,7 @@ import otechniques.network.client.GameNetworkClient;
 import otechniques.objects.GameWorld;
 import otechniques.objects.Trash;
 import otechniques.packets.Packet;
-import otechniques.packets.PlayerPositionPacket;
+import otechniques.packets.PlayerStatePacket;
 import otechniques.render.Renderer;
 import otechniques.utils.DeltaMovement;
 
@@ -43,12 +43,11 @@ public class ClientController extends CommonController {
 		// server state
 		while (client.getReceivedPackets().size() != 0) {
 			Packet packet = client.getReceivedPackets().remove();
-			if (packet instanceof PlayerPositionPacket && packet.playerId == this.playerId) { //TODO w ogole takiego pakietu nie powinien otrzymac
-				calculatePlayerPosition((PlayerPositionPacket) packet);
+			if (packet instanceof PlayerStatePacket) { //TODO w ogole takiego pakietu nie powinien otrzymac
+				refreshPlayerState((PlayerStatePacket) packet);
 			} // else if(...)
 
 		}
-
 		
 		if(isClientControllable){
 			client.createInputPackets(inputHandler.getKeysPressed(), inputHandler.getKeysReleased());
@@ -92,15 +91,15 @@ public class ClientController extends CommonController {
 		getPlayerBody(playerId).setLinearVelocity(calculateMovementVector(inputHandler.getKeysPressed()));
 	}
 
-	private void calculatePlayerPosition(PlayerPositionPacket positionPacket) {
-		getPlayerBody(playerId).setTransform(positionPacket.x, positionPacket.y, getPlayerBody(playerId).getAngle());
-
+	private void refreshPlayerState(PlayerStatePacket statePacket) {
+		getPlayerBody(statePacket.playerId).setTransform(statePacket.position, statePacket.rotation);
+		
 		if (Config.SERVER_RECONCILIATION) {
 
 			for (int i = 0; i < deltaMovements.size(); i++) {
 				// removes all packets, which were already acknowledged and
 				// applied to client
-				if (deltaMovements.get(i).sequenceNumber <= positionPacket.sequenceNumber) {
+				if (deltaMovements.get(i).sequenceNumber <= statePacket.sequenceNumber) {
 					deltaMovements.remove(i);
 				} else {
 					DeltaMovement d = deltaMovements.get(i);

@@ -18,12 +18,12 @@ public class ClientPart {
 	public final int clientId;
 	public final boolean isClientControllable;
 
-	public ClientPart(int clientId, boolean isClientControllable) {
-		this.clientId = clientId;
+	public ClientPart(boolean isClientControllable) {
 		this.isClientControllable = isClientControllable;
 
-		networkClient = new GameNetworkClient(clientId);
-
+		networkClient = new GameNetworkClient();
+		clientId = networkClient.getClientId();
+		
 		gameWorld = new GameWorld();
 		gameWorld.createPlayer(clientId);
 
@@ -38,6 +38,7 @@ public class ClientPart {
 	}
 
 	public void processClientSide() {
+		controller.processControlPackets(networkClient.getUnprocessedControlPackets());
 		controller.updateGameState(Config.PHYSICS_TIMESTEP);
 		networkClient.sendPackets();
 	}

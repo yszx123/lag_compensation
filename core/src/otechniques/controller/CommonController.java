@@ -3,6 +3,7 @@ package otechniques.controller;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.LinkedBlockingDeque;
 
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.MathUtils;
@@ -13,6 +14,8 @@ import otechniques.Config;
 import otechniques.ObjectsConfig;
 import otechniques.objects.GameWorld;
 import otechniques.objects.Grenade;
+import otechniques.packets.ControlPacket;
+import otechniques.packets.NewPlayerPacket;
 
 public abstract class CommonController {
 	protected final GameWorld gameWorld;
@@ -77,4 +80,18 @@ public abstract class CommonController {
 		return gameWorld.getPlayer(id).body;
 	}
 
+	
+	public void processControlPackets(LinkedBlockingDeque<ControlPacket> unprocessedControlPackets) {
+		ControlPacket packet;
+		while((packet = unprocessedControlPackets.pollFirst()) != null){
+			if (packet instanceof NewPlayerPacket) {
+				NewPlayerPacket p = (NewPlayerPacket) packet;
+				processNewPlayerPacket(p);
+			}
+		}
+	}
+	
+	protected void processNewPlayerPacket(NewPlayerPacket packet){
+		gameWorld.createPlayer(packet.playerId);
+	}
 }

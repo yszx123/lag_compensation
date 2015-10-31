@@ -1,6 +1,8 @@
 package otechniques.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -14,12 +16,13 @@ import otechniques.objects.Grenade;
 import otechniques.objects.Player;
 import otechniques.packets.InputPacket;
 import otechniques.packets.MousePositionPacket;
+import otechniques.packets.NewPlayerPacket;
 import otechniques.packets.Packet;
-import otechniques.packets.PlayerPositionPacket;
+import otechniques.packets.PlayerStatePacket;
 
 public class ServerController extends CommonController {
 	private final GameNetworkServer server;
-	private long lastProcessedRequest;
+	private Map<Integer, Long> lastProcessedRequest = new HashMap<>();
 	private ArrayList<Grenade> objects = new ArrayList<>();
 	float delta;
 
@@ -32,8 +35,11 @@ public class ServerController extends CommonController {
 
 		// process all new packets
 		for (Packet packet : receivedPackets) {
-			lastProcessedRequest = packet.sequenceNumber;
-
+			if(!gameWorld.getPlayers().containsKey(packet.playerId)){
+				continue;
+			}
+			lastProcessedRequest.put(packet.playerId, packet.sequenceNumber);
+			
 			if (packet instanceof InputPacket) {
 				InputPacket p = (InputPacket) packet;
 				processInputPacket(p);
@@ -44,15 +50,14 @@ public class ServerController extends CommonController {
 
 		}
 		delta += Gdx.graphics.getDeltaTime();
-		if (delta >= Config.POSITION_SENDING_FREQUENCY) {
-			delta -= Config.POSITION_SENDING_FREQUENCY;
-			
-			//TODO tu moze byc blad
+		if (delta >= Config.PLAYER_STATE_SENDING_FREQUENCY) {
+			delta -= Config.PLAYER_STATE_SENDING_FREQUENCY;
+
 			for (Player player : gameWorld.getPlayers().values()) {
-				PlayerPositionPacket positionPacket = new PlayerPositionPacket(Config.SERVER_ID, player.getId(),
-						lastProcessedRequest, player.getPosition().x,
-						player.getPosition().y);
-				server.addPacket(positionPacket);
+				PlayerStatePacket statePacket = new PlayerStatePacket(Config.SERVER_ID, player.getId(),
+						lastProcessedRequest.get(player.getId()) == null ? 0 : lastProcessedRequest.get(player.getId()),
+						player.getPosition(), player.getAngle());
+				server.addPacket(statePacket);
 			}
 		}
 
@@ -92,4 +97,12 @@ public class ServerController extends CommonController {
 		getPlayerBody(p.playerId).setTransform(getPlayerBody(p.playerId).getPosition(),
 				calculateDesiredPlayerRotation(p.playerId, p.inWorldMousePos));
 	}
+	
+	@Override
+	protected void processNewPlayerPacket(NewPlayerPacket packet){
+		super.processNewPlayerPacket(packet);
+		//inform other clients that new player has joined
+		server.addControlPacket(new NewPlayerPacket(Config.runId, packet.playerId));	
+	}
+
 }

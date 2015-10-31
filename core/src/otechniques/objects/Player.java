@@ -45,4 +45,8 @@ public class Player {
 		return id;
 	}
 
+	public float getAngle() {
+		return body.getAngle();
+	}
+
 }

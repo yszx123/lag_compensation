@@ -62,7 +62,9 @@ public class GameWorld {
 	}
 	
 	public void createPlayer(int playerId){
-		players.put(playerId, new Player(playerId, 10+playerId, 10-playerId, world)); //TODO dwoch playerow w jednym miejscu
+		if(!players.containsKey(playerId)){
+			players.put(playerId, new Player(playerId, 10+playerId, 10-playerId, world)); //TODO dwoch playerow w jednym miejscu
+		}
 	}
 
 }
