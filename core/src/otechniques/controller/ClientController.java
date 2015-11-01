@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Vector2;
 
 import otechniques.Config;
 import otechniques.input.InputHandler;
+import otechniques.input.InputSupplier;
 import otechniques.network.client.GameNetworkClient;
 import otechniques.objects.GameWorld;
 import otechniques.objects.Trash;
@@ -20,17 +21,17 @@ public class ClientController extends CommonController {
 	private final int playerId;
 	private final boolean isClientControllable;
 	private final GameNetworkClient client;
-	private final InputHandler inputHandler;
+	private final InputSupplier inputSupplier;
 	private final ArrayList<DeltaMovement> deltaMovements;
 	private final ArrayList<Trash> trashObjects;
 
 	public ClientController(int playerId, boolean isClientControllable, GameWorld gameWorld, GameNetworkClient client,
-			InputHandler inputHandler) {
+			InputSupplier inputSupplier) {
 		super(gameWorld);
 		this.playerId = playerId;
 		this.isClientControllable = isClientControllable;
 		this.client = client;
-		this.inputHandler = inputHandler;
+		this.inputSupplier = inputSupplier;
 		deltaMovements = new ArrayList<>();
 		trashObjects = new ArrayList<>();
 		createTrash();
@@ -49,8 +50,9 @@ public class ClientController extends CommonController {
 
 		}
 		
-		if(isClientControllable){
-			client.createInputPackets(inputHandler.getKeysPressed(), inputHandler.getKeysReleased());
+		
+		client.createInputPackets(inputSupplier.getKeysPressed(), inputSupplier.getKeysReleased());
+		if(isClientControllable){			
 			client.createMousePositionPackets();
 		}
 
@@ -62,12 +64,12 @@ public class ClientController extends CommonController {
 			// movement
 			appplyRecentMovementInput();
 			DeltaMovement d = new DeltaMovement();
-			d.deltaMovement = calculateMovementVector(inputHandler.getKeysPressed()).scl(Config.PHYSICS_TIMESTEP);
+			d.deltaMovement = calculateMovementVector(inputSupplier.getKeysPressed()).scl(Config.PHYSICS_TIMESTEP);
 			d.sequenceNumber = client.getLastSequenceNumber();
 			deltaMovements.add(d);
 
 			// grenades
-			if (inputHandler.getKeysReleased().contains(Keys.G)) {
+			if (inputSupplier.getKeysReleased().contains(Keys.G)) {
 				throwGrenade(playerId);
 			}
 			
@@ -78,8 +80,6 @@ public class ClientController extends CommonController {
 			}
 
 			updateCommonGameState(timeStep);
-			inputHandler.refresh(); // TODO clears released keys
-
 		}
 	}
 
@@ -88,7 +88,7 @@ public class ClientController extends CommonController {
 	 * waiting for server acknowledgment
 	 */
 	private void appplyRecentMovementInput() {
-		getPlayerBody(playerId).setLinearVelocity(calculateMovementVector(inputHandler.getKeysPressed()));
+		getPlayerBody(playerId).setLinearVelocity(calculateMovementVector(inputSupplier.getKeysPressed()));
 	}
 
 	private void refreshPlayerState(PlayerStatePacket statePacket) {
@@ -120,4 +120,6 @@ public class ClientController extends CommonController {
 			trashObjects.add(trash);
 		}
 	}
+	
+	
 }

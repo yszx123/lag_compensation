@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryonet.Client;
 
@@ -43,9 +44,6 @@ public class GameNetworkClient {
 
 	}
 
-	public void addPacket(Packet p) {
-		packetsToSend.add(p);
-	}
 
 	public void sendPackets() { // TODO zmiana na zegar
 
@@ -73,7 +71,7 @@ public class GameNetworkClient {
 
 	public void createMousePositionPackets() {
 		Vector2 inWorldMousePos = Renderer.getInWorldMousePosition();
-		MousePositionPacket p = new MousePositionPacket(clientId, clientId, lastSequenceNumber, inWorldMousePos);
+		MousePositionPacket p = new MousePositionPacket(clientId, clientId, ++lastSequenceNumber, inWorldMousePos);
 		packetsToSend.add(p);
 	}
 

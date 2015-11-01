@@ -5,7 +5,10 @@ import java.util.UUID;
 public class Config {
 	public static final String runId = UUID.randomUUID().toString();
 	
+	
+	
 	public static final int SERVER_ID = 0;
+	
 	
 	public static final int TCP_PORT = 54555;
 	public static final int UDP_PORT = 54777;
@@ -28,6 +31,8 @@ public class Config {
 	public static final short COLLISION_MASK_SCENERY = -1;
 	public static final short COLLISION_MASK_PLAYER = COLLISION_CATEGORY_SCENERY;
 	
+	public static final float INPUT_SPOOFING_CHANGE_FREQ = 0.5f;
+	
 	public static final long CLIENT_PING = 200;	//latency in packets sending, in milliseconds
 	public static long SERVER_PING = 200;
 	public static final float PLAYER_STATE_SENDING_FREQUENCY = 1/60f;
@@ -36,7 +41,7 @@ public class Config {
 	
 	public static final boolean SERVER_RECONCILIATION = false;
 
-
+	
 
 	public static boolean CLIENT_SIDE_PREDICTION = false;
 

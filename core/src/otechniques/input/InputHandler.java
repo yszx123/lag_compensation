@@ -6,7 +6,7 @@ import java.util.Set;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 
-public class InputHandler extends InputAdapter {
+public class InputHandler extends InputAdapter implements InputSupplier{
 
 	private Set<Integer> keysPressed;
 	private Set<Integer> keysReleased;

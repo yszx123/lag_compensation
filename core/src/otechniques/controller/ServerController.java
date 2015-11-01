@@ -55,7 +55,7 @@ public class ServerController extends CommonController {
 
 			for (Player player : gameWorld.getPlayers().values()) {
 				PlayerStatePacket statePacket = new PlayerStatePacket(Config.SERVER_ID, player.getId(),
-						lastProcessedRequest.get(player.getId()) == null ? 0 : lastProcessedRequest.get(player.getId()),
+						lastProcessedRequest.get(player.getId()),
 						player.getPosition(), player.getAngle());
 				server.addPacket(statePacket);
 			}
@@ -102,6 +102,7 @@ public class ServerController extends CommonController {
 	protected void processNewPlayerPacket(NewPlayerPacket packet){
 		super.processNewPlayerPacket(packet);
 		//inform other clients that new player has joined
+		lastProcessedRequest.put(packet.playerId, 0L);
 		server.addControlPacket(new NewPlayerPacket(Config.runId, packet.playerId));	
 	}
 
