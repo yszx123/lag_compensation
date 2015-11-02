@@ -1,4 +1,4 @@
-package otechniques.packets;
+package otechniques.network.packets;
 
 import java.util.UUID;
 

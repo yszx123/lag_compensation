@@ -11,6 +11,7 @@ import otechniques.Config;
 import otechniques.ObjectsConfig;
 
 public class Player {
+	
 	public final Body body;
 	private final int id;
 

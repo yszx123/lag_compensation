@@ -1,4 +1,4 @@
-package otechniques.packets;
+package otechniques.network.packets;
 
 public class InputPacket extends Packet {
 
@@ -8,7 +8,6 @@ public class InputPacket extends Packet {
 	
 	@SuppressWarnings("unused")
 	private InputPacket(){}
-	
 
 	public InputPacket(int senderID, int playerId, long sequenceNumber, Integer[] keysPressed, Integer[] keysReleased, float delta) {
 		super(senderID, playerId, sequenceNumber);

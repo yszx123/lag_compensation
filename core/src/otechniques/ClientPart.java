@@ -1,9 +1,9 @@
 package otechniques;
 
-import otechniques.controller.ClientController;
+import otechniques.controllers.ClientController;
 import otechniques.input.InputHandler;
-import otechniques.input.RandomInputSpoofer;
 import otechniques.input.InputSupplier;
+import otechniques.input.RandomInputSpoofer;
 import otechniques.network.client.GameNetworkClient;
 import otechniques.objects.GameWorld;
 import otechniques.render.DebugRenderer;
@@ -14,8 +14,8 @@ public class ClientPart {
 	private Renderer renderer;
 	private InputSupplier inputSupplier;
 	private ClientController controller;
-	private GameNetworkClient networkClient;
-	private GameWorld gameWorld;
+	private final GameNetworkClient networkClient;
+	private final GameWorld gameWorld;
 
 	public final int clientId;
 	public final boolean isClientControllable;

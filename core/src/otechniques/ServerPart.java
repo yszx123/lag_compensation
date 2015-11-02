@@ -1,6 +1,6 @@
 package otechniques;
 
-import otechniques.controller.ServerController;
+import otechniques.controllers.ServerController;
 import otechniques.network.server.GameNetworkServer;
 import otechniques.objects.GameWorld;
 import otechniques.render.DebugRenderer;
@@ -8,10 +8,10 @@ import otechniques.render.Renderer;
 import otechniques.render.StandardRenderer;
 
 public class ServerPart {
-	GameNetworkServer server;
-	ServerController controller;
-	Renderer renderer;
-	GameWorld gameWorld;
+	private final GameNetworkServer server;
+	private final ServerController controller;
+	private Renderer renderer;
+	private final GameWorld gameWorld;
 
 	public ServerPart() {
 		server = new GameNetworkServer();
@@ -37,5 +37,8 @@ public class ServerPart {
 	public void dispose() {
 		gameWorld.getWorld().dispose();
 	}
-
+	
+	public void serRenderer(Renderer renderer){
+		this.renderer = renderer;
+	}
 }

@@ -7,26 +7,25 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryonet.Client;
 
 import otechniques.Config;
 import otechniques.network.ControlPacketListener;
-import otechniques.packets.ControlPacket;
-import otechniques.packets.InputPacket;
-import otechniques.packets.MousePositionPacket;
-import otechniques.packets.Packet;
+import otechniques.network.packets.ControlPacket;
+import otechniques.network.packets.InputPacket;
+import otechniques.network.packets.MousePositionPacket;
+import otechniques.network.packets.Packet;
 import otechniques.render.Renderer;
 
 public class GameNetworkClient {
 	private int clientId;
-	private Client client;
+	private final Client client;
 
-	private LinkedList<Packet> packetsToSend = new LinkedList<>();
-	private ConcurrentLinkedQueue<Packet> receivedPackets = new ConcurrentLinkedQueue<>();
-
-	private LinkedBlockingDeque<ControlPacket> receivedControlPackets = new LinkedBlockingDeque<>();
+	private final LinkedList<Packet> packetsToSend = new LinkedList<>();
+	private final ConcurrentLinkedQueue<Packet> receivedPackets = new ConcurrentLinkedQueue<>();
+	private final LinkedBlockingDeque<ControlPacket> receivedControlPackets = new LinkedBlockingDeque<>();
+	
 	private long lastSequenceNumber;
 
 	public GameNetworkClient() {
@@ -79,14 +78,6 @@ public class GameNetworkClient {
 		return receivedPackets;
 	}
 
-	private void tryToConnect() {
-		try {
-			client.connect(Config.CLIENT_CONNECT_TIMEOUT, Config.SERVER_HOST, Config.TCP_PORT, Config.UDP_PORT);		
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
 	public long getLastSequenceNumber() {
 		return lastSequenceNumber;
 	}
@@ -105,5 +96,13 @@ public class GameNetworkClient {
 	
 	public int getClientId(){
 		return clientId;
+	}
+	
+	private void tryToConnect() {
+		try {
+			client.connect(Config.CLIENT_CONNECT_TIMEOUT, Config.SERVER_HOST, Config.TCP_PORT, Config.UDP_PORT);		
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

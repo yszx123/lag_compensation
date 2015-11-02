@@ -1,5 +1,6 @@
 package otechniques.objects;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,29 +14,57 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
 import otechniques.Config;
+import otechniques.ObjectsConfig;
 
 public class GameWorld {
+
 	private Map<Integer, Player> players = new HashMap<>();
 	private World world;
+	protected ArrayList<GameObject> gameObjects = new ArrayList<>();
 
 	public GameWorld() {
 		world = new World(new Vector2(), true);
-		createWalls();
 	}
 
 	public Player getPlayer(int id) {
 		return players.get(id);
 	}
 
-	public Map<Integer, Player> getPlayers(){
+	public Map<Integer, Player> getPlayers() {
 		return players;
 	}
-	
+
 	public World getWorld() {
 		return world;
 	}
 
-	private void createWalls() { // TODO przeniesc
+	public void createPlayer(int playerId) {
+		if (!players.containsKey(playerId)) {
+			players.put(playerId, new Player(playerId, ObjectsConfig.PLAYER_STARTING_POS + playerId,
+					ObjectsConfig.PLAYER_STARTING_POS - playerId, world));
+		}
+	}
+
+	public void createTrash() {
+		for (int i = 0; i < ObjectsConfig.TRASH_NUM; i++) {
+			float x = MathUtils.random(1, 2 * ObjectsConfig.WALL_SIZE - 1);
+			float y = MathUtils.random(1, 2 * ObjectsConfig.WALL_SIZE - 1);
+			Trash trash = new Trash(world, new Vector2(x, y));
+			gameObjects.add(trash);
+		}
+	}
+
+	public ArrayList<GameObject> getGameObjects() {
+		return gameObjects;
+	}
+
+	public Grenade createGrenade(int playerId) {
+		Grenade g = new Grenade(world, players.get(playerId).body, true);
+		gameObjects.add(g);
+		return g;
+	}
+
+	public void createWalls() {
 
 		BodyDef wallDef = new BodyDef();
 		wallDef.type = BodyType.StaticBody;
@@ -49,22 +78,16 @@ public class GameWorld {
 		fixtureDef.filter.categoryBits = Config.COLLISION_CATEGORY_SCENERY;
 		fixtureDef.filter.maskBits = Config.COLLISION_MASK_SCENERY;
 
-		wallShape.setAsBox(10, 0.1f, new Vector2(10, 20f), 0);
+		float wallLen = ObjectsConfig.WALL_SIZE;
+		wallShape.setAsBox(wallLen, 0.1f, new Vector2(wallLen, 2 * wallLen), 0);
 		wallBody.createFixture(fixtureDef);
-		wallShape.setAsBox(10, 0.1f, new Vector2(10, 0f), 0);
+		wallShape.setAsBox(wallLen, 0.1f, new Vector2(wallLen, 0f), 0);
 		wallBody.createFixture(fixtureDef);
-		wallShape.setAsBox(10, 0.1f, new Vector2(0, 10f), MathUtils.PI / 2f);
+		wallShape.setAsBox(wallLen, 0.1f, new Vector2(0, wallLen), MathUtils.PI / 2f);
 		wallBody.createFixture(fixtureDef);
-		wallShape.setAsBox(10, 0.1f, new Vector2(20f, 10f), MathUtils.PI / 2f);
+		wallShape.setAsBox(wallLen, 0.1f, new Vector2(2 * wallLen, wallLen), MathUtils.PI / 2f);
 		wallBody.createFixture(fixtureDef);
 
 		wallShape.dispose();
 	}
-	
-	public void createPlayer(int playerId){
-		if(!players.containsKey(playerId)){
-			players.put(playerId, new Player(playerId, 10+playerId, 10-playerId, world)); //TODO dwoch playerow w jednym miejscu
-		}
-	}
-
 }

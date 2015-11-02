@@ -3,9 +3,9 @@ package otechniques.render;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 
-public class DebugRenderer extends Renderer{
+public class DebugRenderer implements Renderer{
+	
 	private final Box2DDebugRenderer renderer = new Box2DDebugRenderer();
-
 	private final World world;
 	
 	public DebugRenderer(World world) {

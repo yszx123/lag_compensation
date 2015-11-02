@@ -1,6 +1,5 @@
-package otechniques.controller;
+package otechniques.controllers;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -12,30 +11,40 @@ import com.badlogic.gdx.physics.box2d.Body;
 
 import otechniques.Config;
 import otechniques.ObjectsConfig;
+import otechniques.network.packets.ControlPacket;
+import otechniques.network.packets.NewPlayerPacket;
+import otechniques.objects.GameObject;
 import otechniques.objects.GameWorld;
-import otechniques.objects.Grenade;
-import otechniques.packets.ControlPacket;
-import otechniques.packets.NewPlayerPacket;
 
 public abstract class CommonController {
+	
 	protected final GameWorld gameWorld;
-	protected final ArrayList<Grenade> objects;
 
 	public CommonController(GameWorld gameWorld) {
 		this.gameWorld = gameWorld;
-		objects = new ArrayList<>();
+	}
+	
+	public void processControlPackets(LinkedBlockingDeque<ControlPacket> unprocessedControlPackets) {
+		ControlPacket packet;
+		while((packet = unprocessedControlPackets.pollFirst()) != null){
+			if (packet instanceof NewPlayerPacket) {
+				NewPlayerPacket p = (NewPlayerPacket) packet;
+				processNewPlayerPacket(p);
+			}
+		}
 	}
 
 	protected void updateCommonGameState(float timeStep) {
 
-		for (Iterator<Grenade> iterator = objects.iterator(); iterator.hasNext();) {
-			Grenade g = iterator.next();
-			if (g.isFlaggedForDelete()) {
+		for (Iterator<GameObject> iterator = gameWorld.getGameObjects().iterator(); iterator.hasNext();) {
+			GameObject obj = iterator.next();
+			if (obj.isFlaggedForDelete()) {
 				iterator.remove();
 			} else {
-				g.act(timeStep);
+				obj.act(timeStep);
 			}
 		}
+			
 		gameWorld.getWorld().step(Config.PHYSICS_TIMESTEP, Config.VELOCITY_ITERATIONS, Config.POSITION_ITERATIONS);
 	}
 
@@ -60,12 +69,8 @@ public abstract class CommonController {
 		return playerMovement;
 	}
 
-	protected void throwGrenade(int playerId) { // TODO nie powinno tak byc-
-												// powinno sie uzyc jedynie
-												// funkcji granatu
-		Grenade g = new Grenade(gameWorld.getWorld(), gameWorld.getPlayer(playerId).body, true);
-		objects.add(g);
-		g.throwGrenade();
+	protected void throwGrenade(int playerId) {
+		gameWorld.createGrenade(playerId).throwGrenade();
 	}
 
 	protected float calculateDesiredPlayerRotation(int clientId, Vector2 mousePos) {
@@ -79,19 +84,10 @@ public abstract class CommonController {
 	protected Body getPlayerBody(int id) {
 		return gameWorld.getPlayer(id).body;
 	}
-
-	
-	public void processControlPackets(LinkedBlockingDeque<ControlPacket> unprocessedControlPackets) {
-		ControlPacket packet;
-		while((packet = unprocessedControlPackets.pollFirst()) != null){
-			if (packet instanceof NewPlayerPacket) {
-				NewPlayerPacket p = (NewPlayerPacket) packet;
-				processNewPlayerPacket(p);
-			}
-		}
-	}
 	
 	protected void processNewPlayerPacket(NewPlayerPacket packet){
 		gameWorld.createPlayer(packet.playerId);
 	}
+
+
 }

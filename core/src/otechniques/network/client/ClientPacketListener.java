@@ -5,16 +5,16 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 
-import otechniques.packets.Packet;
-import otechniques.packets.PlayerStatePacket;
+import otechniques.network.packets.Packet;
+import otechniques.network.packets.PlayerStatePacket;
 
 public class ClientPacketListener extends Listener {
 
-	private ConcurrentLinkedQueue<Packet> receivedPackets;
+	private final ConcurrentLinkedQueue<Packet> receivedPackets;
 
-	public ClientPacketListener(ConcurrentLinkedQueue<Packet> receivedPackets2) {
+	public ClientPacketListener(ConcurrentLinkedQueue<Packet> receivedPackets) {
 		super();
-		this.receivedPackets = receivedPackets2;
+		this.receivedPackets = receivedPackets;
 
 	}
 

@@ -1,4 +1,4 @@
-package otechniques.packets;
+package otechniques.network.packets;
 
 import com.badlogic.gdx.math.Vector2;
 

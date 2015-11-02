@@ -6,14 +6,13 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 
 import otechniques.Config;
-import otechniques.packets.ControlPacket;
-import otechniques.packets.NewPlayerPacket;
-import otechniques.packets.Packet;
+import otechniques.network.packets.ControlPacket;
+import otechniques.network.packets.NewPlayerPacket;
 
 
 public class ControlPacketListener extends Listener{
 
-	private LinkedBlockingDeque<ControlPacket> receivedPackets;
+	private final LinkedBlockingDeque<ControlPacket> receivedPackets;
 	private int lastConnectionId = -1; //not conntected yet
 	
 	public ControlPacketListener(LinkedBlockingDeque<ControlPacket> receivedControlPackets) {

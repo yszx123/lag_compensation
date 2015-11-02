@@ -42,7 +42,6 @@ public class RandomInputSpoofer implements InputSupplier {
 			keysPressed.clear();
 			keysPressed.add(keysPossible[random.nextInt(keysPossible.length)]);
 		}
-
 	}
 
 }

@@ -1,6 +1,4 @@
-package otechniques.packets;
-
-import java.util.UUID;
+package otechniques.network.packets;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -37,8 +35,7 @@ public abstract class Packet {
 		kryo.register(InputPacket.class);
 		kryo.register(PlayerStatePacket.class);
 		kryo.register(MousePositionPacket.class);
-		
-		
+			
 		kryo.register(Integer[].class);
 		kryo.register(Vector3.class);
 		kryo.register(Vector2.class);

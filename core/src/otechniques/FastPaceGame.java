@@ -1,7 +1,6 @@
 package otechniques;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -12,45 +11,42 @@ public class FastPaceGame extends ApplicationAdapter {
 	 * number of parts which screen is divided into. Default 1(only server)
 	 */
 	private static int numOfScreenParts = 1;
-	private ArrayList<ClientPart> nonControllableClients = new ArrayList<>();
+	private final ArrayList<ClientPart> nonControllableClients = new ArrayList<>();
 	private ClientPart controllableClient;
 	private ServerPart serverPart;
 
 	@Override
 	public void create() {
-		serverPart = new ServerPart();
-		try {
-			Thread.sleep(30);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-
+		serverPart = new ServerPart();;
 		createClientPart(true);
 		createClientPart(false);
-
 	}
 
 	@Override
 	public void render() {
 		serverPart.processServerSide();
+
 		if (controllableClient != null) {
 			controllableClient.processClientSide();
 		}
+
 		for (ClientPart part : nonControllableClients) {
 			part.processClientSide();
 		}
+
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth() / numOfScreenParts, Gdx.graphics.getHeight());
 		if (controllableClient != null) {
-			controllableClient.renderGraphics(); 
+			controllableClient.renderGraphics();
 		}
+
 		Gdx.gl.glViewport(Gdx.graphics.getWidth() / numOfScreenParts, 0, Gdx.graphics.getWidth() / numOfScreenParts,
 				Gdx.graphics.getHeight());
-		serverPart.renderGraphics(); 
+		serverPart.renderGraphics();
 
-		int screenShiftFactor = 2; // 2 parts of the screen are reserved for
-									// controlled client and server
+		// 2 parts of the screen are reserved for controlled client and server
+		int screenShiftFactor = 2;
 		for (ClientPart part : nonControllableClients) {
 			Gdx.gl.glViewport((Gdx.graphics.getWidth() / numOfScreenParts) * (screenShiftFactor++), 0,
 					Gdx.graphics.getWidth() / numOfScreenParts, Gdx.graphics.getHeight());
@@ -60,7 +56,7 @@ public class FastPaceGame extends ApplicationAdapter {
 
 	@Override
 	public void resize(int width, int height) {
-		if(controllableClient != null){
+		if (controllableClient != null) {
 			controllableClient.resize(width, height);
 		}
 		for (ClientPart part : nonControllableClients) {
@@ -79,10 +75,7 @@ public class FastPaceGame extends ApplicationAdapter {
 
 	public void createClientPart(boolean isClientControllable) {
 		ClientPart newClientPart = new ClientPart(isClientControllable);
-		Gdx.graphics.setDisplayMode(++numOfScreenParts * 400, 400, false); // TODO
-																			// magic
-																			// numbers
-
+		Gdx.graphics.setDisplayMode(++numOfScreenParts * Config.RENDER_PART_SIZE_PX, Config.RENDER_PART_SIZE_PX, false);
 		if (isClientControllable) {
 			this.controllableClient = newClientPart;
 		} else {

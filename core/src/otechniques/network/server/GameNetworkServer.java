@@ -8,8 +8,8 @@ import com.esotericsoftware.kryonet.Server;
 
 import otechniques.Config;
 import otechniques.network.ControlPacketListener;
-import otechniques.packets.ControlPacket;
-import otechniques.packets.Packet;
+import otechniques.network.packets.ControlPacket;
+import otechniques.network.packets.Packet;
 
 /**
  * Receives packets from clients, and then process them. Received packet are put
@@ -68,14 +68,6 @@ public class GameNetworkServer {
 		return unprocessedPackets;
 	}
 
-	private void tryToBind() {
-		try {
-			server.bind(Config.TCP_PORT, Config.UDP_PORT);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
 	public void dispose() {
 		try {
 			server.dispose();
@@ -90,5 +82,13 @@ public class GameNetworkServer {
 
 	public void addControlPacket(ControlPacket packet) {
 		controlPacketQueue.add(packet);
+	}
+	
+	private void tryToBind() {
+		try {
+			server.bind(Config.TCP_PORT, Config.UDP_PORT);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

@@ -10,7 +10,7 @@ public class ObjectsConfig {
 	public static final float GRENADE_PARTICLE_LIVING_TIME = 1.1f;
 	public static final float GRENADE_THROW_POWER = 10f;
 
-	
+	public static final int PLAYER_STARTING_POS = 10;
 	public static float PLAYER_BODY_SIZE =0.5f; 
 	public static float PLAYER_SPEED = 10;
 	
@@ -23,6 +23,9 @@ public class ObjectsConfig {
 	public static final float TRASH_LINEAR_DAMPING_VARIATION_FACTOR = 3.8f;
 	public static final float TRASH_DENSITY = 0.1f;
 	public static final float TRASH_ANGULAR_DAMPING = 0.6f;
+	public static final int TRASH_NUM = 15;
+	
+	public static int WALL_SIZE = 10;
 
 	
 	

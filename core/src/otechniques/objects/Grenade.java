@@ -63,7 +63,6 @@ public class Grenade extends GameObject {
 					"Attempted to throw grenade, which is marked to be deleted or has already exploded");
 		}
 		
-
 		Vector2 directionVector = new Vector2(MathUtils.cos(parentBody.getAngle()), MathUtils.sin(parentBody.getAngle()));
 		body.applyLinearImpulse(directionVector.scl(ObjectsConfig.GRENADE_THROW_POWER), parentBody.getPosition(), true);
 	}
@@ -115,5 +114,5 @@ public class Grenade extends GameObject {
 			grenadeParticles[i] = body;
 		}
 	}
-
+	
 }

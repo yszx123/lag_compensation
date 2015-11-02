@@ -2,7 +2,7 @@ package otechniques.render;
 
 import otechniques.objects.GameWorld;
 
-public class StandardRenderer extends Renderer{
+public class StandardRenderer implements Renderer{
 	
 	private final GameWorld world;
 	
