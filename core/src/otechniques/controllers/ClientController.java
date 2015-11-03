@@ -44,9 +44,9 @@ public class ClientController extends CommonController {
 
 		}
 		
-		client.createInputPackets(inputSupplier.getKeysPressed(), inputSupplier.getKeysReleased());
+		client.createInputPacket(inputSupplier.getKeysPressed(), inputSupplier.getKeysReleased());
 		if(isClientControllable){			
-			client.createMousePositionPackets();
+			client.createMousePositionPacket();
 		}
 
 		if (Config.CLIENT_SIDE_PREDICTION) {

@@ -1,13 +1,13 @@
 package otechniques.network.server;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.concurrent.LinkedBlockingDeque;
 
+import com.esotericsoftware.kryonet.Listener.LagListener;
 import com.esotericsoftware.kryonet.Server;
 
 import otechniques.Config;
 import otechniques.network.ControlPacketListener;
+import otechniques.network.PacketManager;
 import otechniques.network.packets.ControlPacket;
 import otechniques.network.packets.Packet;
 
@@ -19,53 +19,32 @@ import otechniques.network.packets.Packet;
  * ping parameter.
  *
  */
-public class GameNetworkServer {
-	Server server = new Server();
+public class GameNetworkServer extends PacketManager {
 
-	private LinkedBlockingDeque<Packet> receivedPackets = new LinkedBlockingDeque<>();;
-	private LinkedBlockingDeque<ControlPacket> receivedControlPackets = new LinkedBlockingDeque<>();;
-	private LinkedBlockingDeque<Packet> packetQueue = new LinkedBlockingDeque<>();;
-	private LinkedBlockingDeque<ControlPacket> controlPacketQueue = new LinkedBlockingDeque<>();;
+	private final Server server = new Server();
 
 	public GameNetworkServer() {
 		Packet.registerClasses(server);
 
 		server.start();
 		server.addListener(new ControlPacketListener(receivedControlPackets));
-		server.addListener(new ServerPacketListener(receivedPackets));
+		server.addListener(
+				new LagListener(Config.SERVER_PING, Config.SERVER_PING, new ServerPacketListener(receivedPackets)));
 		tryToBind();
 	}
 
-	public void sendPackets() { // TODO poprawic te metode na lepsza wydajnosc
-		for (ControlPacket controlPacket : controlPacketQueue) {
-			server.sendToAllTCP(controlPacket);
-		}
-		
-		for (Packet packet : packetQueue) {
-			long currentTime = System.currentTimeMillis();
-			if (currentTime - packet.timestamp >= Config.SERVER_PING) {
-				server.sendToAllUDP(packet);
-				packetQueue.remove(packet);
-			}
-		}
-	}
+	public void sendPackets() {
 
-	public void addPacket(Packet p) {
-		packetQueue.add(p);
-	}
-
-	public ArrayList<Packet> getUnprocessedGamestatePackets() {
-		Packet packet;
-		ArrayList<Packet> unprocessedPackets = new ArrayList<>(
-				// its assumed, that some (possibly not more than buffer size)
-				// packets may arrive during copying
-				receivedPackets.size() + Config.SERVER_PACKET_BUFFER_SIZE);
-
-		while ((packet = receivedPackets.poll()) != null) {
-			unprocessedPackets.add(packet);
+		ControlPacket cp;
+		while ((cp = controlPacketSendingQueue.poll()) != null) {
+			server.sendToAllTCP(cp);
 		}
 
-		return unprocessedPackets;
+		Packet p;
+		while ((p = packetSendingQueue.poll()) != null) {
+			server.sendToAllUDP(p);
+		}
+
 	}
 
 	public void dispose() {
@@ -76,14 +55,6 @@ public class GameNetworkServer {
 		}
 	}
 
-	public LinkedBlockingDeque<ControlPacket> getUnprocessedControlPackets() {
-		return receivedControlPackets;
-	}
-
-	public void addControlPacket(ControlPacket packet) {
-		controlPacketQueue.add(packet);
-	}
-	
 	private void tryToBind() {
 		try {
 			server.bind(Config.TCP_PORT, Config.UDP_PORT);

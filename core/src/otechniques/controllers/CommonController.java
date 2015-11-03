@@ -2,7 +2,7 @@ package otechniques.controllers;
 
 import java.util.Iterator;
 import java.util.Set;
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.MathUtils;
@@ -24,9 +24,9 @@ public abstract class CommonController {
 		this.gameWorld = gameWorld;
 	}
 	
-	public void processControlPackets(LinkedBlockingDeque<ControlPacket> unprocessedControlPackets) {
+	public void processControlPackets(ConcurrentLinkedQueue<ControlPacket> unprocessedControlPackets) {
 		ControlPacket packet;
-		while((packet = unprocessedControlPackets.pollFirst()) != null){
+		while((packet = unprocessedControlPackets.poll()) != null){
 			if (packet instanceof NewPlayerPacket) {
 				NewPlayerPacket p = (NewPlayerPacket) packet;
 				processNewPlayerPacket(p);

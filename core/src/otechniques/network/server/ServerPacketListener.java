@@ -1,19 +1,19 @@
 package otechniques.network.server;
 
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 
 import otechniques.network.packets.Packet;
 
-public class ServerPacketListener extends Listener {
-	private final LinkedBlockingDeque<Packet> receivedPackets;
+public class ServerPacketListener extends Listener {	
 	
-	public ServerPacketListener(LinkedBlockingDeque<Packet> receivedPackets) {
+	private final ConcurrentLinkedQueue<Packet> receivedPackets;
+	
+	public ServerPacketListener(ConcurrentLinkedQueue<Packet> receivedPackets) {
 		super();
-		this.receivedPackets = receivedPackets;
-		
+		this.receivedPackets = receivedPackets;	
 	}	
 	
 	@Override

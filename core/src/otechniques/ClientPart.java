@@ -44,7 +44,7 @@ public class ClientPart {
 	}
 
 	public void processClientSide() {
-		controller.processControlPackets(networkClient.getUnprocessedControlPackets());
+		controller.processControlPackets(networkClient.getReceivedControlPackets());
 		controller.updateGameState(Config.PHYSICS_TIMESTEP);
 		networkClient.sendPackets();
 		inputSupplier.refresh();

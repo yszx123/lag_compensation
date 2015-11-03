@@ -1,6 +1,6 @@
 package otechniques.network;
 
-import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
@@ -12,10 +12,10 @@ import otechniques.network.packets.NewPlayerPacket;
 
 public class ControlPacketListener extends Listener{
 
-	private final LinkedBlockingDeque<ControlPacket> receivedPackets;
+	private final ConcurrentLinkedQueue<ControlPacket> receivedPackets;
 	private int lastConnectionId = -1; //not conntected yet
 	
-	public ControlPacketListener(LinkedBlockingDeque<ControlPacket> receivedControlPackets) {
+	public ControlPacketListener(ConcurrentLinkedQueue<ControlPacket> receivedControlPackets) {
 		super();
 		this.receivedPackets = receivedControlPackets;	
 	}	

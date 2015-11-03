@@ -20,6 +20,12 @@ public class ClientPacketListener extends Listener {
 
 	@Override
 	public void received(Connection connection, Object object) {
+		if(object instanceof Packet){
+			Packet packet = (Packet)object;
+			if(packet.senderID != 0)
+				return;
+		}
+		
 		if (object instanceof PlayerStatePacket) {
 			PlayerStatePacket p = (PlayerStatePacket) object;
 			receivedPackets.add(p);

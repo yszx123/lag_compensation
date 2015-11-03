@@ -3,6 +3,7 @@ package otechniques.controllers;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -32,9 +33,10 @@ public class ServerController extends CommonController {
 		gameWorld.createWalls();
 	}
 
-	public void updateGamestate(ArrayList<Packet> receivedPackets, float timestep) {
+	public void updateGamestate(ConcurrentLinkedQueue<Packet> receivedPackets, float timestep) {
 
-		for (Packet packet : receivedPackets) {
+		Packet packet;
+		while((packet = receivedPackets.poll()) != null){
 			if (!gameWorld.getPlayers().containsKey(packet.playerId)) {
 				continue;
 			}
@@ -49,6 +51,7 @@ public class ServerController extends CommonController {
 			}
 
 		}
+		
 		delta += Gdx.graphics.getDeltaTime();
 		if (delta >= Config.PLAYER_STATE_SENDING_FREQUENCY) {
 			delta -= Config.PLAYER_STATE_SENDING_FREQUENCY;
