@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Listener.LagListener;
 
-import otechniques.Config;
+import otechniques.config.Config;
 import otechniques.network.ControlPacketListener;
 import otechniques.network.PacketManager;
 import otechniques.network.packets.ControlPacket;
@@ -20,12 +20,11 @@ import otechniques.render.Renderer;
 public class GameNetworkClient extends PacketManager {
 
 	private int clientId;
-	private final Client client;
+	private final Client client = new Client();;
 
 	private long lastSequenceNumber;
 
 	public GameNetworkClient() {
-		client = new Client();
 		Packet.registerClasses(client);
 
 		ControlPacketListener controlPacketListener = new ControlPacketListener(receivedControlPackets);
@@ -34,8 +33,9 @@ public class GameNetworkClient extends PacketManager {
 				new LagListener(Config.CLIENT_PING, Config.CLIENT_PING, new ClientPacketListener(receivedPackets)));
 		client.start();
 		tryToConnect();
-		while (controlPacketListener.getLastConnectionId() == -1)
+		while (controlPacketListener.getLastConnectionId() == -1) {
 			; // busy waiting for client to connect
+		}
 		clientId = controlPacketListener.getLastConnectionId();
 	}
 

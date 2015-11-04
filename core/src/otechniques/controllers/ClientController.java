@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import com.badlogic.gdx.Input.Keys;
 
-import otechniques.Config;
+import otechniques.config.Config;
 import otechniques.input.InputSupplier;
 import otechniques.network.client.GameNetworkClient;
 import otechniques.network.packets.Packet;

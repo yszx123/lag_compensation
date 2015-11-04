@@ -7,9 +7,9 @@ import java.util.Set;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 
-import otechniques.Config;
+import otechniques.config.Config;
 
-public class RandomInputSpoofer implements InputSupplier {
+public class RandomInputSpoofer implements InputSupplier{
 
 	private float timeSinceInputChange;
 	private final int[] keysPossible;

@@ -1,9 +1,8 @@
 package otechniques;
 
+import otechniques.config.Config;
 import otechniques.controllers.ClientController;
-import otechniques.input.InputHandler;
 import otechniques.input.InputSupplier;
-import otechniques.input.RandomInputSpoofer;
 import otechniques.network.client.GameNetworkClient;
 import otechniques.objects.GameWorld;
 import otechniques.render.DebugRenderer;
@@ -11,7 +10,7 @@ import otechniques.render.Renderer;
 import otechniques.render.StandardRenderer;
 
 public class ClientPart {
-	private Renderer renderer;
+	private final Renderer renderer;
 	private InputSupplier inputSupplier;
 	private ClientController controller;
 	private final GameNetworkClient networkClient;
@@ -20,23 +19,15 @@ public class ClientPart {
 	public final int clientId;
 	public final boolean isClientControllable;
 
-	public ClientPart(boolean isClientControllable) {
+	public ClientPart(boolean isClientControllable, InputSupplier inputSupplier) {
 		this.isClientControllable = isClientControllable;
+		this.inputSupplier = inputSupplier;
 
 		networkClient = new GameNetworkClient();
 		clientId = networkClient.getClientId();
-		
+
 		gameWorld = new GameWorld();
 		gameWorld.createPlayer(clientId);
-
-		
-		if(isClientControllable){	
-			InputHandler inputHandler = new InputHandler();
-			inputHandler.setupInputHandler();
-			inputSupplier = inputHandler;
-		}else{
-			inputSupplier = new RandomInputSpoofer();
-		}
 
 		controller = new ClientController(clientId, isClientControllable, gameWorld, networkClient, inputSupplier);
 

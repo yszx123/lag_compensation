@@ -9,8 +9,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Vector2;
 
-import otechniques.Config;
-import otechniques.ObjectsConfig;
+import otechniques.config.Config;
+import otechniques.config.ObjectsConfig;
 import otechniques.network.packets.InputPacket;
 import otechniques.network.packets.MousePositionPacket;
 import otechniques.network.packets.NewPlayerPacket;

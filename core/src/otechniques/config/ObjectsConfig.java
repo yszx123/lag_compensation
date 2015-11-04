@@ -1,4 +1,4 @@
-package otechniques;
+package otechniques.config;
 
 public class ObjectsConfig {
 

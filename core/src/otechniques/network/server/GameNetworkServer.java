@@ -5,7 +5,7 @@ import java.io.IOException;
 import com.esotericsoftware.kryonet.Listener.LagListener;
 import com.esotericsoftware.kryonet.Server;
 
-import otechniques.Config;
+import otechniques.config.Config;
 import otechniques.network.ControlPacketListener;
 import otechniques.network.PacketManager;
 import otechniques.network.packets.ControlPacket;

@@ -1,4 +1,4 @@
-package otechniques;
+package otechniques.config;
 
 import java.util.UUID;
 

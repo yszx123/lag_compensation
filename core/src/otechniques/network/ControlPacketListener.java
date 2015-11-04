@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 
-import otechniques.Config;
+import otechniques.config.Config;
 import otechniques.network.packets.ControlPacket;
 import otechniques.network.packets.NewPlayerPacket;
 

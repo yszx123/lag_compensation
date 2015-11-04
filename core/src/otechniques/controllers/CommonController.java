@@ -9,8 +9,8 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 
-import otechniques.Config;
-import otechniques.ObjectsConfig;
+import otechniques.config.Config;
+import otechniques.config.ObjectsConfig;
 import otechniques.network.packets.ControlPacket;
 import otechniques.network.packets.NewPlayerPacket;
 import otechniques.objects.GameObject;

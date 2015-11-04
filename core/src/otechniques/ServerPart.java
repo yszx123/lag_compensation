@@ -1,5 +1,6 @@
 package otechniques;
 
+import otechniques.config.Config;
 import otechniques.controllers.ServerController;
 import otechniques.network.server.GameNetworkServer;
 import otechniques.objects.GameWorld;
