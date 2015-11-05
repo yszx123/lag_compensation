@@ -1,7 +1,13 @@
 package otechniques;
 
+import java.util.LinkedList;
+
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+
 import otechniques.config.Config;
 import otechniques.controllers.ServerController;
+import otechniques.network.ControlPacketObserver;
+import otechniques.network.packets.ControlPacket;
 import otechniques.network.server.GameNetworkServer;
 import otechniques.objects.GameWorld;
 import otechniques.render.DebugRenderer;
@@ -9,16 +15,19 @@ import otechniques.render.Renderer;
 import otechniques.render.StandardRenderer;
 
 public class ServerPart {
-	private final GameNetworkServer server;
+	private final GameNetworkServer networkServer;
 	private final ServerController controller;
 	private Renderer renderer;
 	private final GameWorld gameWorld;
+	private final LinkedList<ControlPacketObserver> controlPacketObservers = new LinkedList<>();
 
-	public ServerPart() {
-		server = new GameNetworkServer();
+	public ServerPart(SpriteBatch batch) {
+		networkServer = new GameNetworkServer();
+		controlPacketObservers.add(networkServer);
 		gameWorld = new GameWorld();
-		controller = new ServerController(gameWorld, server);
-		renderer = Config.DEBUG_RENDER ? new DebugRenderer(gameWorld.getWorld()) : new StandardRenderer(gameWorld);
+		controller = new ServerController(gameWorld, networkServer);
+		controlPacketObservers.add(controller);
+		renderer = Config.DEBUG_RENDER ? new DebugRenderer(batch, gameWorld.getWorld()) : new StandardRenderer(batch, gameWorld);
 	}
 
 	public void renderGraphics() {
@@ -26,11 +35,20 @@ public class ServerPart {
 	}
 
 	public void processServerSide() {
-		controller.processControlPackets(server.getReceivedControlPackets());
-		controller.updateGamestate(server.getReceivedPackets(), Config.PHYSICS_TIMESTEP);
-		server.sendPackets();
+		ControlPacket cp;
+		while((cp = networkServer.getReceivedControlPackets().poll()) != null){
+			networkServer.processPacket(cp);
+			controller.processPacket(cp);
+		}
+			
+		controller.updateGamestate(networkServer.getReceivedPackets(), Config.PHYSICS_TIMESTEP);
+		networkServer.sendPackets();
 	}
-
+	
+	public void addReceivedControlPacket(ControlPacket packet){
+		networkServer.addReceivedControlPacket(packet);
+	}
+	
 	public void resize(int width, int height) {
 		renderer.resize(width, height);
 	}
@@ -42,4 +60,5 @@ public class ServerPart {
 	public void serRenderer(Renderer renderer){
 		this.renderer = renderer;
 	}
+	
 }

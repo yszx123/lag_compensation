@@ -13,7 +13,7 @@ import otechniques.network.packets.NewPlayerPacket;
 public class ControlPacketListener extends Listener{
 
 	private final ConcurrentLinkedQueue<ControlPacket> receivedPackets;
-	private int lastConnectionId = -1; //not conntected yet
+	private int lastConnectionId = -1; //not connected yet
 	
 	public ControlPacketListener(ConcurrentLinkedQueue<ControlPacket> receivedControlPackets) {
 		super();
@@ -27,9 +27,10 @@ public class ControlPacketListener extends Listener{
 		}
 		
 		ControlPacket packet = (ControlPacket)object;
-		if(!packet.runId.equals(Config.runId)){
+/*		if(!packet.runId.equals(Config.runId)){ TODO nie wiem czy to powinno byc
+			System.out.println("zly run id");
 			return;
-		}
+		}*/
 		
 		receivedPackets.add(packet);
     }

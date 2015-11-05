@@ -16,8 +16,12 @@ public abstract class PacketManager {
 		return receivedControlPackets;
 	}
 
-	public void addControlPacket(ControlPacket packet) {
+	public void addControlPacketToSend(ControlPacket packet) {
 		controlPacketSendingQueue.add(packet);
+	}
+	
+	public void addReceivedControlPacket(ControlPacket packet) {
+		receivedControlPackets.add(packet);
 	}
 
 	public void addPacket(Packet p) {

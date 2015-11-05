@@ -12,7 +12,7 @@ import otechniques.config.ObjectsConfig;
 
 public class Player {
 	
-	public final Body body;
+	private final Body body;
 	private final int id;
 
 	public Player(int id, float x, float y, World world) {
@@ -22,6 +22,7 @@ public class Player {
 		bodyDef.type = BodyDef.BodyType.DynamicBody;
 		bodyDef.position.set(x, y);
 		bodyDef.fixedRotation = true;
+		bodyDef.allowSleep = false;
 		body = world.createBody(bodyDef);
 		
 		PolygonShape shape = new PolygonShape();
@@ -49,5 +50,8 @@ public class Player {
 	public float getAngle() {
 		return body.getAngle();
 	}
-
+	
+	public Body getBody(){
+		return body;
+	}
 }

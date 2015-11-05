@@ -10,25 +10,28 @@ import com.badlogic.gdx.math.Vector3;
 import otechniques.FastPaceGame;
 import otechniques.config.Config;
 
-public interface Renderer {
+public abstract class Renderer {
 
-	SpriteBatch batch = new SpriteBatch();
-	OrthographicCamera camera = new OrthographicCamera();
+	protected SpriteBatch batch;
+	protected static OrthographicCamera camera = new OrthographicCamera();
+	
+	public Renderer(SpriteBatch batch){
+		this.batch = batch;
+	}
+	
+	public abstract void render();
 
-
-	void render();
-
-	default void resize(final int width, final int height) {
+	public void resize(final int width, final int height) {
 		camera.viewportHeight = Config.CAMERA_VIEW_HEIGHT;
 		camera.viewportWidth = Config.CAMERA_VIEW_WIDTH;
 		camera.update();
 	}
 
-	default Camera getCamera() {
+	public Camera getCamera() {
 		return camera;
 	}
 
-	static Vector2 getInWorldMousePosition() {
+	public static Vector2 getInWorldMousePosition() {
 		Vector3 absoluteMousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
 		Vector3 inWorldMousePos = camera.unproject(absoluteMousePos);
 		// screen(and also x coordinates) is divided into
@@ -36,7 +39,7 @@ public interface Renderer {
 		return new Vector2(inWorldMousePos.x * FastPaceGame.getNumOfScreenParts(), inWorldMousePos.y);
 	}
 
-	default void dispose() {
+	public void dispose() {
 		batch.dispose();
 	}
 }

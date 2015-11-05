@@ -4,41 +4,57 @@ import java.util.ArrayList;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-import otechniques.GUI.GUI;
+import otechniques.GUI.Gui;
 import otechniques.config.Config;
 import otechniques.input.InputHandler;
 import otechniques.input.InputSupplier;
 import otechniques.input.RandomInputSpoofer;
+import otechniques.network.packets.ConfigurationControlPacket;
 
 public class FastPaceGame extends ApplicationAdapter {
-	/**
-	 * number of parts which screen is divided into. Default 1(only server)
-	 */
-	private static int numOfScreenParts = 1;
+	private final InputMultiplexer inputMultiplexer = new InputMultiplexer();
+	private SpriteBatch batch;
 	private final ArrayList<ClientPart> nonControllableClients = new ArrayList<>();
 	private ClientPart controllableClient;
 	private ServerPart serverPart;
-	private GUI gui;
-	private final InputMultiplexer inputMultiplexer = new InputMultiplexer();
+	private Gui gui;
+	private static int numOfScreenParts = 1;
+	private boolean isGuiOpened;
+
 
 	@Override
 	public void create() {
+		batch = new SpriteBatch();
 		Gdx.input.setInputProcessor(inputMultiplexer);
-		
-		createGUI();
 		
 		createServerPart();
 		
+		createGUI();
+		addControlInputHandler();
+		
 		createClientPart(true);
 		createClientPart(false);
+		
+		configureSubParts();
 	}
 
 	@Override
 	public void render() {
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		
+		if(isGuiOpened){
+			Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+			gui.render();
+			return;
+		}
+			
 		serverPart.processServerSide();
 
 		if (controllableClient != null) {
@@ -48,8 +64,6 @@ public class FastPaceGame extends ApplicationAdapter {
 		for (ClientPart part : nonControllableClients) {
 			part.processClientSide();
 		}
-
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth() / numOfScreenParts, Gdx.graphics.getHeight());
 		if (controllableClient != null) {
@@ -68,9 +82,6 @@ public class FastPaceGame extends ApplicationAdapter {
 			part.renderGraphics();
 		}
 		
-		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		gui.render();
-		
 	}
 
 	@Override
@@ -86,6 +97,7 @@ public class FastPaceGame extends ApplicationAdapter {
 		serverPart.resize(width, height);
 		
 		gui.resize(width, height);
+		
 	}
 
 	@Override
@@ -110,7 +122,7 @@ public class FastPaceGame extends ApplicationAdapter {
 			inputSupplier = new RandomInputSpoofer();
 		}
 		
-		ClientPart newClientPart = new ClientPart(isClientControllable, inputSupplier);
+		ClientPart newClientPart = new ClientPart(isClientControllable, inputSupplier,batch);
 		
 		Gdx.graphics.setDisplayMode(++numOfScreenParts * Config.RENDER_PART_SIZE_PX, Config.RENDER_PART_SIZE_PX, false);
 		if (isClientControllable) {
@@ -121,7 +133,7 @@ public class FastPaceGame extends ApplicationAdapter {
 	}
 
 	private void createServerPart(){
-		serverPart = new ServerPart();;
+		serverPart = new ServerPart(batch);;
 		try {
 			Thread.sleep(30);
 		} catch (InterruptedException e) {
@@ -130,9 +142,31 @@ public class FastPaceGame extends ApplicationAdapter {
 	}
 	
 	private void createGUI(){
-		gui = new GUI();
-		gui.create();
+		gui = new Gui();
+		gui.create(batch);
 		inputMultiplexer.addProcessor(gui.getInputProcessor());
 	}
 	
+	private void addControlInputHandler(){
+		inputMultiplexer.addProcessor(new InputAdapter(){
+			public boolean keyUp(int key){
+				if(key == Keys.F1){
+					isGuiOpened = !isGuiOpened;
+					configureSubParts();
+				}
+				return false;		
+			}
+		});
+	}
+	
+	private void configureSubParts(){
+		ConfigurationControlPacket p = new ConfigurationControlPacket(Config.runId);
+		p.clientSidePrediction = gui.isClientSidePrediction();
+		p.serverReconciliation = gui.isServerReconciliation();
+		p.minPing = gui.getMinPing();
+		p.maxPing = gui.getMaxPing();
+		p.packetLossRate = gui.getPacketLossRate();
+		
+		serverPart.addReceivedControlPacket(p);
+	}
 }

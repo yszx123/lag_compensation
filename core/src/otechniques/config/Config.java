@@ -30,14 +30,20 @@ public class Config {
 
 	public static final float INPUT_SPOOFING_CHANGE_FREQ = 0.5f;
 
-	public static final int CLIENT_PING = 200; 
-	public static int SERVER_PING = 200;
+	public static final int CLIENT_PING = 0; 
+	public static int SERVER_PING = 0;
+	
+	public static int MAX_PING = 1000;
+	public static int MIN_PING = 0;
+	public static int PACKET_LOSS_PERCENT = 0;
+	
 	public static final float PLAYER_STATE_SENDING_FREQUENCY = 1 / 60f;
 
 	public static boolean SERVER_RECONCILIATION = true;
 	public static boolean CLIENT_SIDE_PREDICTION = true;
 		
 	public static final int RENDER_PART_SIZE_PX = 400;
+	
 	public static int CAMERA_VIEW_WIDTH = 20;
 	public static int CAMERA_VIEW_HEIGHT = 20;
 

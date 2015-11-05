@@ -9,13 +9,12 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
-
-import otechniques.config.Config;
-import otechniques.config.ObjectsConfig;
-
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+
+import otechniques.config.Config;
+import otechniques.config.ObjectsConfig;
 
 public class GameWorld {
 
@@ -60,7 +59,7 @@ public class GameWorld {
 	}
 
 	public Grenade createGrenade(int playerId) {
-		Grenade g = new Grenade(world, players.get(playerId).body, true);
+		Grenade g = new Grenade(world, players.get(playerId).getBody(), true);
 		gameObjects.add(g);
 		return g;
 	}

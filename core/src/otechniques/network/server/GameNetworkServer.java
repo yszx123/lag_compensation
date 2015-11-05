@@ -2,12 +2,15 @@ package otechniques.network.server;
 
 import java.io.IOException;
 
-import com.esotericsoftware.kryonet.Listener.LagListener;
+import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 
 import otechniques.config.Config;
 import otechniques.network.ControlPacketListener;
+import otechniques.network.ControlPacketObserver;
 import otechniques.network.PacketManager;
+import otechniques.network.SelectiveLagListener;
+import otechniques.network.packets.ConfigurationControlPacket;
 import otechniques.network.packets.ControlPacket;
 import otechniques.network.packets.Packet;
 
@@ -19,17 +22,16 @@ import otechniques.network.packets.Packet;
  * ping parameter.
  *
  */
-public class GameNetworkServer extends PacketManager {
+public class GameNetworkServer extends PacketManager implements ControlPacketObserver {
 
 	private final Server server = new Server();
+	private Listener currentLagListener;
 
 	public GameNetworkServer() {
 		Packet.registerClasses(server);
 
 		server.start();
 		server.addListener(new ControlPacketListener(receivedControlPackets));
-		server.addListener(
-				new LagListener(Config.SERVER_PING, Config.SERVER_PING, new ServerPacketListener(receivedPackets)));
 		tryToBind();
 	}
 
@@ -45,6 +47,20 @@ public class GameNetworkServer extends PacketManager {
 			server.sendToAllUDP(p);
 		}
 
+	}
+
+	public void processPacket(ControlPacket packet) {
+		if (packet instanceof ConfigurationControlPacket) {
+			ConfigurationControlPacket p = (ConfigurationControlPacket) packet;
+			if (currentLagListener != null) {
+				server.removeListener(currentLagListener);
+			}
+			currentLagListener = new SelectiveLagListener(p.minPing, p.maxPing, p.packetLossRate,
+					new ServerPacketListener(receivedPackets));
+			server.addListener(currentLagListener);
+
+			controlPacketSendingQueue.add(p);
+		}
 	}
 
 	public void dispose() {

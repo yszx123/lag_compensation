@@ -6,21 +6,25 @@ import java.util.Set;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.esotericsoftware.kryonet.Client;
-import com.esotericsoftware.kryonet.Listener.LagListener;
+import com.esotericsoftware.kryonet.Listener;
 
 import otechniques.config.Config;
 import otechniques.network.ControlPacketListener;
+import otechniques.network.ControlPacketObserver;
 import otechniques.network.PacketManager;
+import otechniques.network.SelectiveLagListener;
+import otechniques.network.packets.ConfigurationControlPacket;
 import otechniques.network.packets.ControlPacket;
 import otechniques.network.packets.InputPacket;
 import otechniques.network.packets.MousePositionPacket;
 import otechniques.network.packets.Packet;
 import otechniques.render.Renderer;
 
-public class GameNetworkClient extends PacketManager {
+public class GameNetworkClient extends PacketManager implements ControlPacketObserver {
 
 	private int clientId;
 	private final Client client = new Client();;
+	private Listener currentLagListener;
 
 	private long lastSequenceNumber;
 
@@ -29,8 +33,6 @@ public class GameNetworkClient extends PacketManager {
 
 		ControlPacketListener controlPacketListener = new ControlPacketListener(receivedControlPackets);
 		client.addListener(controlPacketListener);
-		client.addListener(
-				new LagListener(Config.CLIENT_PING, Config.CLIENT_PING, new ClientPacketListener(receivedPackets)));
 		client.start();
 		tryToConnect();
 		while (controlPacketListener.getLastConnectionId() == -1) {
@@ -92,5 +94,19 @@ public class GameNetworkClient extends PacketManager {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public void processPacket(ControlPacket packet) {
+		if (packet instanceof ConfigurationControlPacket) {
+			ConfigurationControlPacket p = (ConfigurationControlPacket) packet;
+			if (currentLagListener != null) {
+				client.removeListener(currentLagListener);
+			}
+			currentLagListener = new SelectiveLagListener(p.minPing, p.maxPing, p.packetLossRate,
+					new ClientPacketListener(receivedPackets));
+			client.addListener(currentLagListener);
+		}
+
 	}
 }

@@ -11,6 +11,8 @@ import com.badlogic.gdx.math.Vector2;
 
 import otechniques.config.Config;
 import otechniques.config.ObjectsConfig;
+import otechniques.network.ControlPacketObserver;
+import otechniques.network.packets.ConfigurationControlPacket;
 import otechniques.network.packets.InputPacket;
 import otechniques.network.packets.MousePositionPacket;
 import otechniques.network.packets.NewPlayerPacket;
@@ -21,7 +23,7 @@ import otechniques.objects.GameWorld;
 import otechniques.objects.Grenade;
 import otechniques.objects.Player;
 
-public class ServerController extends CommonController {
+public final class ServerController extends CommonController implements ControlPacketObserver{
 	private final GameNetworkServer server;
 	private Map<Integer, Long> lastProcessedRequest = new HashMap<>();
 	private ArrayList<Grenade> objects = new ArrayList<>();
@@ -67,11 +69,11 @@ public class ServerController extends CommonController {
 	}
 
 	@Override
-	protected void processNewPlayerPacket(NewPlayerPacket packet) {
-		super.processNewPlayerPacket(packet);
+	protected void processPacket(NewPlayerPacket packet) {
+		super.processPacket(packet);
 		// inform other clients that new player has joined
 		lastProcessedRequest.put(packet.playerId, 0L);
-		server.addControlPacket(new NewPlayerPacket(Config.runId, packet.playerId));
+		server.addControlPacketToSend(new NewPlayerPacket(Config.runId, packet.playerId));
 	}
 
 	private Vector2 calculateMovementVector(Integer[] keysClicked) {
@@ -91,7 +93,7 @@ public class ServerController extends CommonController {
 	}
 
 	private void processInputPacket(InputPacket p) {
-		gameWorld.getPlayer(p.playerId).body.setLinearVelocity(calculateMovementVector(p.keysPressed));
+		gameWorld.getPlayer(p.playerId).getBody().setLinearVelocity(calculateMovementVector(p.keysPressed));
 
 		getPlayerBody(p.playerId).setTransform(getPlayerBody(p.playerId).getPosition(),
 				getPlayerBody(p.playerId).getAngle());
@@ -106,6 +108,10 @@ public class ServerController extends CommonController {
 	private void processMousePositionPacket(MousePositionPacket p) {
 		getPlayerBody(p.playerId).setTransform(getPlayerBody(p.playerId).getPosition(),
 				calculateDesiredPlayerRotation(p.playerId, p.inWorldMousePos));
+	}
+
+	@Override
+	protected void processPacket(ConfigurationControlPacket packet) {
 	}
 
 }

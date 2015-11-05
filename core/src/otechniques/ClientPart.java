@@ -1,9 +1,15 @@
 package otechniques;
 
+import java.util.LinkedList;
+
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+
 import otechniques.config.Config;
 import otechniques.controllers.ClientController;
 import otechniques.input.InputSupplier;
+import otechniques.network.ControlPacketObserver;
 import otechniques.network.client.GameNetworkClient;
+import otechniques.network.packets.ControlPacket;
 import otechniques.objects.GameWorld;
 import otechniques.render.DebugRenderer;
 import otechniques.render.Renderer;
@@ -15,32 +21,39 @@ public class ClientPart {
 	private ClientController controller;
 	private final GameNetworkClient networkClient;
 	private final GameWorld gameWorld;
+	private final LinkedList<ControlPacketObserver> controlPacketObservers = new LinkedList<>();
 
-	public final int clientId;
-	public final boolean isClientControllable;
 
-	public ClientPart(boolean isClientControllable, InputSupplier inputSupplier) {
-		this.isClientControllable = isClientControllable;
+	public ClientPart(boolean isClientControllable, InputSupplier inputSupplier, SpriteBatch batch) {
 		this.inputSupplier = inputSupplier;
 
 		networkClient = new GameNetworkClient();
-		clientId = networkClient.getClientId();
+		int clientId = networkClient.getClientId();
+		controlPacketObservers.add(networkClient);
 
 		gameWorld = new GameWorld();
 		gameWorld.createPlayer(clientId);
 
 		controller = new ClientController(clientId, isClientControllable, gameWorld, networkClient, inputSupplier);
+		controlPacketObservers.add(controller);
 
-		renderer = Config.DEBUG_RENDER ? new DebugRenderer(gameWorld.getWorld()) : new StandardRenderer(gameWorld);
+		renderer = Config.DEBUG_RENDER ? new DebugRenderer(batch, gameWorld.getWorld())
+				: new StandardRenderer(batch, gameWorld);
 	}
 
 	public void processClientSide() {
-		controller.processControlPackets(networkClient.getReceivedControlPackets());
+		ControlPacket controlPacket;
+		while((controlPacket = networkClient.getReceivedControlPackets().poll()) != null){
+			for (ControlPacketObserver controlPacketObserver : controlPacketObservers) {
+				controlPacketObserver.processPacket(controlPacket);
+			}
+		}
 		controller.updateGameState(Config.PHYSICS_TIMESTEP);
 		networkClient.sendPackets();
 		inputSupplier.refresh();
 	}
 
+	
 	public void renderGraphics() {
 		renderer.render();
 	}

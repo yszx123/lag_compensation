@@ -2,7 +2,6 @@ package otechniques.controllers;
 
 import java.util.Iterator;
 import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.MathUtils;
@@ -11,26 +10,28 @@ import com.badlogic.gdx.physics.box2d.Body;
 
 import otechniques.config.Config;
 import otechniques.config.ObjectsConfig;
+import otechniques.network.ControlPacketObserver;
+import otechniques.network.packets.ConfigurationControlPacket;
 import otechniques.network.packets.ControlPacket;
 import otechniques.network.packets.NewPlayerPacket;
 import otechniques.objects.GameObject;
 import otechniques.objects.GameWorld;
+import otechniques.objects.Player;
 
-public abstract class CommonController {
-	
+public abstract class CommonController implements ControlPacketObserver{
+
 	protected final GameWorld gameWorld;
 
 	public CommonController(GameWorld gameWorld) {
 		this.gameWorld = gameWorld;
 	}
-	
-	public void processControlPackets(ConcurrentLinkedQueue<ControlPacket> unprocessedControlPackets) {
-		ControlPacket packet;
-		while((packet = unprocessedControlPackets.poll()) != null){
-			if (packet instanceof NewPlayerPacket) {
-				NewPlayerPacket p = (NewPlayerPacket) packet;
-				processNewPlayerPacket(p);
-			}
+
+	@Override
+	public void processPacket(ControlPacket packet) {
+		if (packet instanceof NewPlayerPacket) {
+			processPacket((NewPlayerPacket) packet);
+		} else if (packet instanceof ConfigurationControlPacket) {
+			processPacket((ConfigurationControlPacket) packet);
 		}
 	}
 
@@ -44,7 +45,7 @@ public abstract class CommonController {
 				obj.act(timeStep);
 			}
 		}
-			
+
 		gameWorld.getWorld().step(Config.PHYSICS_TIMESTEP, Config.VELOCITY_ITERATIONS, Config.POSITION_ITERATIONS);
 	}
 
@@ -74,20 +75,24 @@ public abstract class CommonController {
 	}
 
 	protected float calculateDesiredPlayerRotation(int clientId, Vector2 mousePos) {
-		float playerY = gameWorld.getPlayer(clientId).body.getPosition().y;
-		float playerX = gameWorld.getPlayer(clientId).body.getPosition().x;
+		float playerY = gameWorld.getPlayer(clientId).getBody().getPosition().y;
+		float playerX = gameWorld.getPlayer(clientId).getBody().getPosition().x;
 
 		float desiredAngle = MathUtils.atan2(mousePos.y - playerY, mousePos.x - playerX);
 		return desiredAngle;
 	}
 
 	protected Body getPlayerBody(int id) {
-		return gameWorld.getPlayer(id).body;
+		return gameWorld.getPlayer(id).getBody();
 	}
-	
-	protected void processNewPlayerPacket(NewPlayerPacket packet){
+		
+	protected Player getPlayer(int id){
+		return gameWorld.getPlayer(id);
+	}
+
+	protected void processPacket(NewPlayerPacket packet) {
 		gameWorld.createPlayer(packet.playerId);
 	}
 
-
+	protected abstract void processPacket(ConfigurationControlPacket packet);
 }
