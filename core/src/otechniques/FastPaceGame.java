@@ -166,7 +166,9 @@ public class FastPaceGame extends ApplicationAdapter {
 		p.minPing = gui.getMinPing();
 		p.maxPing = gui.getMaxPing();
 		p.packetLossRate = gui.getPacketLossRate();
-		
+		p.wasResetIssued = gui.wasResetIssued();
 		serverPart.addReceivedControlPacket(p);
+		
+		
 	}
 }

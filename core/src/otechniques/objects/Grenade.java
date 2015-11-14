@@ -5,12 +5,11 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
-
-import otechniques.config.ObjectsConfig;
-
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
+
+import otechniques.config.ObjectsConfig;
 
 public class Grenade extends GameObject {
 
@@ -23,7 +22,7 @@ public class Grenade extends GameObject {
 	public Grenade(World world, Body parentBody, boolean isIgnited) {
 		super(world);
 		setParentBody(parentBody);
-		setBody(createBody(parentBody.getPosition()));
+		setBody(createBody(parentBody.getPosition()), Type.GRENADE);
 		this.grenadeParticles = new Body[ObjectsConfig.GRENADE_FRAGS_COUNT];
 		this.isIgnited = isIgnited;
 		this.timeLeftToExplosion = ObjectsConfig.GRENADE_EXPLOSION_LATENCY;

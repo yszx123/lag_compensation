@@ -20,6 +20,8 @@ public class Config {
 
 	public static final float PHYSICS_TIMESTEP = 1 / 60f;
 	public static final float PHYSICS_TIMESTEP_MS = PHYSICS_TIMESTEP * 1000;
+	
+	public static final float RAYCAST_LEN = 100;
 
 	public static final short COLLISION_CATEGORY_PLAYER = 0x0001;
 	public static final short COLLISION_CATEGORY_TRASH = 0x0002;
@@ -28,7 +30,9 @@ public class Config {
 	public static final short COLLISION_MASK_SCENERY = -1;
 	public static final short COLLISION_MASK_PLAYER = COLLISION_CATEGORY_SCENERY;
 
-	public static final float INPUT_SPOOFING_CHANGE_FREQ = 0.5f;
+	public static final float INPUT_SPOOFING_CHANGE_FREQ = 4.5f;
+	
+	public static final int NUMBER_OF_SNAPSHOTS_SAVED = 60;
 
 	public static final int CLIENT_PING = 0; 
 	public static int SERVER_PING = 0;

@@ -27,7 +27,7 @@ public class ServerPart {
 		gameWorld = new GameWorld();
 		controller = new ServerController(gameWorld, networkServer);
 		controlPacketObservers.add(controller);
-		renderer = Config.DEBUG_RENDER ? new DebugRenderer(batch, gameWorld.getWorld()) : new StandardRenderer(batch, gameWorld);
+		renderer = Config.DEBUG_RENDER ? new DebugRenderer(batch, gameWorld) : new StandardRenderer(batch, gameWorld);
 	}
 
 	public void renderGraphics() {

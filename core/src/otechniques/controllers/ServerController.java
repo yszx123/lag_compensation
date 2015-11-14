@@ -1,16 +1,13 @@
 package otechniques.controllers;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.math.Vector2;
 
 import otechniques.config.Config;
-import otechniques.config.ObjectsConfig;
 import otechniques.network.ControlPacketObserver;
 import otechniques.network.packets.ConfigurationControlPacket;
 import otechniques.network.packets.InputPacket;
@@ -20,14 +17,15 @@ import otechniques.network.packets.Packet;
 import otechniques.network.packets.PlayerStatePacket;
 import otechniques.network.server.GameNetworkServer;
 import otechniques.objects.GameWorld;
-import otechniques.objects.Grenade;
 import otechniques.objects.Player;
+import otechniques.utils.CircularBuffer;
+import otechniques.utils.PositionSnapshot;
 
-public final class ServerController extends CommonController implements ControlPacketObserver{
+public final class ServerController extends CommonController implements ControlPacketObserver {
 	private final GameNetworkServer server;
 	private Map<Integer, Long> lastProcessedRequest = new HashMap<>();
-	private ArrayList<Grenade> objects = new ArrayList<>();
-	float delta;
+	private CircularBuffer<PositionSnapshot> positionSnapshots = new CircularBuffer<>(Config.NUMBER_OF_SNAPSHOTS_SAVED);
+	private float timeSincePacketSending;
 
 	public ServerController(GameWorld gameWorld, GameNetworkServer server) {
 		super(gameWorld);
@@ -38,7 +36,7 @@ public final class ServerController extends CommonController implements ControlP
 	public void updateGamestate(ConcurrentLinkedQueue<Packet> receivedPackets, float timestep) {
 
 		Packet packet;
-		while((packet = receivedPackets.poll()) != null){
+		while ((packet = receivedPackets.poll()) != null) {
 			if (!gameWorld.getPlayers().containsKey(packet.playerId)) {
 				continue;
 			}
@@ -53,10 +51,10 @@ public final class ServerController extends CommonController implements ControlP
 			}
 
 		}
-		
-		delta += Gdx.graphics.getDeltaTime();
-		if (delta >= Config.PLAYER_STATE_SENDING_FREQUENCY) {
-			delta -= Config.PLAYER_STATE_SENDING_FREQUENCY;
+
+		timeSincePacketSending += Gdx.graphics.getDeltaTime();
+		if (timeSincePacketSending >= Config.PLAYER_STATE_SENDING_FREQUENCY) {
+			timeSincePacketSending -= Config.PLAYER_STATE_SENDING_FREQUENCY;
 
 			for (Player player : gameWorld.getPlayers().values()) {
 				PlayerStatePacket statePacket = new PlayerStatePacket(Config.SERVER_ID, player.getId(),
@@ -66,6 +64,7 @@ public final class ServerController extends CommonController implements ControlP
 		}
 
 		updateCommonGameState(timestep);
+		savePositionSnapshots();
 	}
 
 	@Override
@@ -76,27 +75,17 @@ public final class ServerController extends CommonController implements ControlP
 		server.addControlPacketToSend(new NewPlayerPacket(Config.runId, packet.playerId));
 	}
 
-	private Vector2 calculateMovementVector(Integer[] keysClicked) {
-		Vector2 playerMovement = new Vector2();
-		for (int key : keysClicked) {
-			if (key == Keys.W) {
-				playerMovement.add(new Vector2(0, ObjectsConfig.PLAYER_SPEED));
-			} else if (key == Keys.S) {
-				playerMovement.add(new Vector2(0, -ObjectsConfig.PLAYER_SPEED));
-			} else if (key == Keys.A) {
-				playerMovement.add(new Vector2(-ObjectsConfig.PLAYER_SPEED, 0));
-			} else if (key == Keys.D) {
-				playerMovement.add(new Vector2(ObjectsConfig.PLAYER_SPEED, 0));
+	@Override
+	protected void processPacket(ConfigurationControlPacket packet) {
+		if (packet.wasResetIssued) {
+			for (Player player : gameWorld.getPlayers().values()) {
+				player.reset();
 			}
 		}
-		return playerMovement;
 	}
 
 	private void processInputPacket(InputPacket p) {
 		gameWorld.getPlayer(p.playerId).getBody().setLinearVelocity(calculateMovementVector(p.keysPressed));
-
-		getPlayerBody(p.playerId).setTransform(getPlayerBody(p.playerId).getPosition(),
-				getPlayerBody(p.playerId).getAngle());
 
 		for (int key : p.keysReleased) {
 			if (key == Keys.G) {
@@ -110,8 +99,18 @@ public final class ServerController extends CommonController implements ControlP
 				calculateDesiredPlayerRotation(p.playerId, p.inWorldMousePos));
 	}
 
-	@Override
-	protected void processPacket(ConfigurationControlPacket packet) {
+	private void savePositionSnapshots() {
+		if ((frameNumber % 2) == 0) {
+			return;
+		}
+
+		PositionSnapshot snapshot = new PositionSnapshot();
+		snapshot.timestamp = System.currentTimeMillis();
+		for (Player player : gameWorld.getPlayers().values()) {
+			snapshot.playerPositionSnapshots.put(player.getId(), player.getPosition().cpy());
+		}
+
+		positionSnapshots.put(snapshot);
 	}
 
 }

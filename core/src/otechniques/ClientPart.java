@@ -37,7 +37,7 @@ public class ClientPart {
 		controller = new ClientController(clientId, isClientControllable, gameWorld, networkClient, inputSupplier);
 		controlPacketObservers.add(controller);
 
-		renderer = Config.DEBUG_RENDER ? new DebugRenderer(batch, gameWorld.getWorld())
+		renderer = Config.DEBUG_RENDER ? new DebugRenderer(batch, gameWorld)
 				: new StandardRenderer(batch, gameWorld);
 	}
 

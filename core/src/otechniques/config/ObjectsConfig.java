@@ -9,10 +9,16 @@ public class ObjectsConfig {
 	public static final int GRENADE_FRAGS_COUNT = 60;
 	public static final float GRENADE_PARTICLE_LIVING_TIME = 1.1f;
 	public static final float GRENADE_THROW_POWER = 10f;
-
+	
+	private static final int ROUNDS_PER_MINUTE = 600;
+	public static final int SHOOTING_TIMESPAN_MS = (60*1000) / ROUNDS_PER_MINUTE;
+	public static final float BULLET_SPEED = 320f;
+	
 	public static final int PLAYER_STARTING_POS = 10;
-	public static float PLAYER_BODY_SIZE =0.5f; 
+	public static float PLAYER_BODY_SIZE = 0.75f; 
 	public static float PLAYER_SPEED = 10;
+	
+	
 	
 	public static final float TRASH_SIZE = 0.12f;
 	public static final float TRASH_SIZE_VARIATION_FACTOR = 0.07f;

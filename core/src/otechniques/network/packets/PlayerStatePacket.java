@@ -2,8 +2,6 @@ package otechniques.network.packets;
 
 import com.badlogic.gdx.math.Vector2;
 
-import javafx.css.PseudoClass;
-
 public class PlayerStatePacket extends Packet {
 
 	public Vector2 position;

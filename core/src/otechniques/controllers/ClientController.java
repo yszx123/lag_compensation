@@ -2,6 +2,7 @@ package otechniques.controllers;
 
 import java.util.ArrayList;
 
+import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Vector2;
 
@@ -23,12 +24,12 @@ public final class ClientController extends CommonController implements ControlP
 	private final GameNetworkClient client;
 	private final InputSupplier inputSupplier;
 	private final ArrayList<DeltaMovement> deltaMovements = new ArrayList<>();
-	
+
 	public ClientController(int playerId, boolean isClientControllable, GameWorld gameWorld, GameNetworkClient client,
 			InputSupplier inputSupplier) {
 		super(gameWorld);
 		gameWorld.createWalls();
-		//gameWorld.createTrash();
+		gameWorld.createTrash();
 		this.playerId = playerId;
 		this.isClientControllable = isClientControllable;
 		this.client = client;
@@ -42,7 +43,7 @@ public final class ClientController extends CommonController implements ControlP
 		if (isClientControllable) {
 			client.createMousePositionPacket();
 		}
-		
+
 		// iterate over all received packets to update gamestate accordingly to
 		// server state
 		while (client.getReceivedPackets().size() != 0) {
@@ -52,24 +53,33 @@ public final class ClientController extends CommonController implements ControlP
 			} // else if(...)
 
 		}
-		
+
 		if (clientSidePrediction) {
 			// movement
 			appplyRecentMovementInput();
-			
+
+			// shooting
+			if (inputSupplier.isButtonPressed(Buttons.LEFT)) {
+				shootRay(playerId);
+			}
 			// grenades
 			if (inputSupplier.getKeysReleased().contains(Keys.G)) {
 				throwGrenade(playerId);
 			}
 			// apply rotation only for controllable player
-			if (isClientControllable) { 
+			if (isClientControllable) {
 				getPlayerBody(playerId).setTransform(getPlayerBody(playerId).getPosition(),
 						calculateDesiredPlayerRotation(playerId, Renderer.getInWorldMousePosition()));
 			}
 		}
-		
+
+		Vector2 oldPos = new Vector2(getPlayerBody(playerId).getPosition());
 		updateCommonGameState(timeStep);
-		
+		Vector2 newPos = new Vector2(getPlayerBody(playerId).getPosition());
+		DeltaMovement d = new DeltaMovement();
+		d.deltaMovement = newPos.sub(oldPos);
+		d.sequenceNumber = client.getLastSequenceNumber();
+		deltaMovements.add(d);
 	}
 
 	/**
@@ -81,25 +91,30 @@ public final class ClientController extends CommonController implements ControlP
 	}
 
 	private void refreshPlayerState(PlayerStatePacket statePacket) {
-		//System.out.print("last ack: " + statePacket.position.toString());
-		getPlayerBody(statePacket.playerId).setTransform(statePacket.position, statePacket.rotation);
-		
+		//TODO cos zamula przy ustawianiu rotacji, dlatego ustawia ja tylko botom
+		getPlayerBody(statePacket.playerId).setTransform(statePacket.position,
+				statePacket.playerId == playerId && isClientControllable ? getPlayer(playerId).getAngle() : statePacket.rotation);
+
+		if (statePacket.playerId != playerId) {
+			return; // below techniques can be only applied to controlled player
+		}
+
 		if (serverReconciliation) {
+			Vector2 cummulatedDeltaMovement = new Vector2();
 
 			for (int i = 0; i < deltaMovements.size(); i++) {
 				// removes all packets, which were already acknowledged and
 				// applied to client
-				Vector2 cummulatedDeltaMovement = new Vector2();
-				//System.out.println("    cumulated: " +cummulatedDeltaMovement.toString());
 				if (deltaMovements.get(i).sequenceNumber <= statePacket.sequenceNumber) {
 					deltaMovements.remove(i);
 				} else {
 					DeltaMovement d = deltaMovements.get(i);
 					cummulatedDeltaMovement.add(d.deltaMovement);
 				}
-				getPlayerBody(statePacket.playerId).setTransform(statePacket.position.add(cummulatedDeltaMovement),
-						getPlayerBody(statePacket.playerId).getAngle());
 			}
+
+			getPlayerBody(statePacket.playerId).setTransform(statePacket.position.add(cummulatedDeltaMovement),
+					getPlayerBody(statePacket.playerId).getAngle());
 		} else {
 			getPlayerBody(statePacket.playerId).setTransform(statePacket.position, statePacket.rotation);
 			deltaMovements.clear();

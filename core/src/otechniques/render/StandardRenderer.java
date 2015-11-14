@@ -6,6 +6,7 @@ import otechniques.objects.GameWorld;
 
 public class StandardRenderer extends Renderer {
 
+	@SuppressWarnings("unused")
 	private final GameWorld world;
 
 	public StandardRenderer(SpriteBatch batch, GameWorld world) {

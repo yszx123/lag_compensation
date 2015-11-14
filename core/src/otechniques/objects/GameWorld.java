@@ -15,6 +15,7 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import otechniques.config.Config;
 import otechniques.config.ObjectsConfig;
+import otechniques.objects.GameObject.Type;
 
 public class GameWorld {
 
@@ -40,8 +41,10 @@ public class GameWorld {
 
 	public void createPlayer(int playerId) {
 		if (!players.containsKey(playerId)) {
-			players.put(playerId, new Player(playerId, ObjectsConfig.PLAYER_STARTING_POS + playerId,
-					ObjectsConfig.PLAYER_STARTING_POS - playerId, world));
+			Player p = new Player(playerId, ObjectsConfig.PLAYER_STARTING_POS + playerId,
+					ObjectsConfig.PLAYER_STARTING_POS - playerId, world);
+			players.put(playerId, p);
+			gameObjects.add(p);
 		}
 	}
 
@@ -70,7 +73,8 @@ public class GameWorld {
 		wallDef.type = BodyType.StaticBody;
 		wallDef.position.set(new Vector2());
 		Body wallBody = world.createBody(wallDef);
-
+		wallBody.setUserData(Type.WALL);
+		
 		PolygonShape wallShape = new PolygonShape();
 		FixtureDef fixtureDef = new FixtureDef();
 		fixtureDef.shape = wallShape;
@@ -90,4 +94,5 @@ public class GameWorld {
 
 		wallShape.dispose();
 	}
+	
 }

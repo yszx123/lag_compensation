@@ -12,15 +12,20 @@ import otechniques.config.Config;
 public class RandomInputSpoofer implements InputSupplier{
 
 	private float timeSinceInputChange;
-	private final int[] keysPossible;
+	private int[] keysPossible;
 
 	private Set<Integer> keysPressed = new HashSet<>();
 	private Set<Integer> keysReleased = new HashSet<>();
 
 	private Random random = new Random();
 
+	public enum InputType{
+		RANDOM,
+		UP_DOWN
+	}
+	
 	public RandomInputSpoofer() {
-		keysPossible = new int[] { -1, -1, -1, -1, Keys.A, Keys.D, Keys.W, Keys.S };
+		setInputType(InputType.RANDOM);
 	}
 
 	@Override
@@ -34,6 +39,11 @@ public class RandomInputSpoofer implements InputSupplier{
 	}
 
 	@Override
+	public boolean isButtonPressed(int button) {
+		return false;
+	}
+	
+	@Override
 	public void refresh() {
 		timeSinceInputChange += Gdx.graphics.getDeltaTime();
 
@@ -43,5 +53,18 @@ public class RandomInputSpoofer implements InputSupplier{
 			keysPressed.add(keysPossible[random.nextInt(keysPossible.length)]);
 		}
 	}
+	
+	public void setInputType(InputType type){
+		if(type == InputType.RANDOM){
+			keysPossible = new int[] { -1, -1, -1, -1, Keys.A, Keys.D, Keys.W, Keys.S };
+		}
+		else if(type == InputType.UP_DOWN){
+			keysPossible = new int[] {Keys.W, Keys.S };
+		}
+		else{
+			throw new IllegalArgumentException();
+		}
+	}
+
 
 }

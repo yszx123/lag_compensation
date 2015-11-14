@@ -7,6 +7,12 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.CircleShape;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.RayCastCallback;
 
 import otechniques.config.Config;
 import otechniques.config.ObjectsConfig;
@@ -15,12 +21,14 @@ import otechniques.network.packets.ConfigurationControlPacket;
 import otechniques.network.packets.ControlPacket;
 import otechniques.network.packets.NewPlayerPacket;
 import otechniques.objects.GameObject;
+import otechniques.objects.GameObject.Type;
 import otechniques.objects.GameWorld;
 import otechniques.objects.Player;
 
-public abstract class CommonController implements ControlPacketObserver{
+public abstract class CommonController implements ControlPacketObserver {
 
 	protected final GameWorld gameWorld;
+	protected long frameNumber;
 
 	public CommonController(GameWorld gameWorld) {
 		this.gameWorld = gameWorld;
@@ -47,6 +55,7 @@ public abstract class CommonController implements ControlPacketObserver{
 		}
 
 		gameWorld.getWorld().step(Config.PHYSICS_TIMESTEP, Config.VELOCITY_ITERATIONS, Config.POSITION_ITERATIONS);
+		frameNumber++;
 	}
 
 	/**
@@ -70,8 +79,68 @@ public abstract class CommonController implements ControlPacketObserver{
 		return playerMovement;
 	}
 
+	protected Vector2 calculateMovementVector(Integer[] keysClicked) {
+		Vector2 playerMovement = new Vector2();
+
+		for (int key : keysClicked) {
+			if (key == Keys.W) {
+				playerMovement.add(new Vector2(0, ObjectsConfig.PLAYER_SPEED));
+			} else if (key == Keys.S) {
+				playerMovement.add(new Vector2(0, -ObjectsConfig.PLAYER_SPEED));
+			} else if (key == Keys.A) {
+				playerMovement.add(new Vector2(-ObjectsConfig.PLAYER_SPEED, 0));
+			} else if (key == Keys.D) {
+				playerMovement.add(new Vector2(ObjectsConfig.PLAYER_SPEED, 0));
+			}
+		}
+
+		return playerMovement;
+	}
+
 	protected void throwGrenade(int playerId) {
 		gameWorld.createGrenade(playerId).throwGrenade();
+	}
+
+	protected void shootRay(int playerId) {
+		if (!gameWorld.getPlayer(playerId).shoot()) {
+			return;
+		}
+
+		RayCastCallback callback = (Fixture fixture, Vector2 point, Vector2 normal, float fraction) -> {
+			Type collidedBodyType = (Type) fixture.getBody().getUserData();
+			if (collidedBodyType == Type.TRASH) {
+				return -1;
+			} else {
+				return 0;
+			}
+		};
+
+		Vector2 p1 = getPlayerBody(playerId).getPosition().cpy();
+		Vector2 p2 = new Vector2(getPlayerBody(playerId).getPosition().cpy()
+				.add(getPlayer(playerId).getOrientationVector().scl(Config.RAYCAST_LEN)));
+
+		gameWorld.getWorld().rayCast(callback, p1, p2);
+
+	}
+
+	protected void shootBullet(int playerId) {
+		Player p = gameWorld.getPlayer(playerId);
+
+		BodyDef bodyDef = new BodyDef();
+		bodyDef.type = BodyType.DynamicBody;
+		bodyDef.fixedRotation = true;
+		bodyDef.bullet = true;
+		bodyDef.linearDamping = 10;
+		bodyDef.position.set(p.getPosition());
+		bodyDef.linearVelocity.set(p.getOrientationVector().scl(ObjectsConfig.BULLET_SPEED));
+		Body body = gameWorld.getWorld().createBody(bodyDef);
+
+		CircleShape circleShape = new CircleShape();
+		circleShape.setRadius(0.05f);
+
+		FixtureDef fixtureDef = new FixtureDef();
+		fixtureDef.shape = circleShape;
+		body.createFixture(fixtureDef);
 	}
 
 	protected float calculateDesiredPlayerRotation(int clientId, Vector2 mousePos) {
@@ -85,8 +154,8 @@ public abstract class CommonController implements ControlPacketObserver{
 	protected Body getPlayerBody(int id) {
 		return gameWorld.getPlayer(id).getBody();
 	}
-		
-	protected Player getPlayer(int id){
+
+	protected Player getPlayer(int id) {
 		return gameWorld.getPlayer(id);
 	}
 

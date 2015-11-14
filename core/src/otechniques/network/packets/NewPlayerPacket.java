@@ -1,7 +1,5 @@
 package otechniques.network.packets;
 
-import java.util.UUID;
-
 public class NewPlayerPacket extends ControlPacket{
 	
 	public int playerId;

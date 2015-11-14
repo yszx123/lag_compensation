@@ -3,6 +3,7 @@ package otechniques.input;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 
 public class InputHandler extends InputAdapter implements InputSupplier{
@@ -35,10 +36,16 @@ public class InputHandler extends InputAdapter implements InputSupplier{
 	public Set<Integer> getKeysReleased() {
 		return keysReleased;
 	}
-
-
+	
+	@Override
+	public boolean isButtonPressed(int button) {
+		return Gdx.input.isButtonPressed(button);
+	}
+	
 	public void refresh() {
 		keysReleased.clear();
 	}
+
+
 
 }
