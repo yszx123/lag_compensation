@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
 import otechniques.input.InputSupplier;
@@ -21,6 +22,8 @@ public final class ClientController extends CommonController implements ControlP
 	private final boolean isClientControllable;
 	private boolean clientSidePrediction;
 	private boolean serverReconciliation;
+	private boolean autoAim;
+	private int autoAimTargetId;
 	private final GameNetworkClient client;
 	private final InputSupplier inputSupplier;
 	private final ArrayList<DeltaMovement> deltaMovements = new ArrayList<>();
@@ -40,8 +43,11 @@ public final class ClientController extends CommonController implements ControlP
 	public void updateGameState(float timeStep) {
 
 		client.createInputPacket(inputSupplier.getKeysPressed(), inputSupplier.getKeysReleased());
+		// mouse position should only be sent by controllable client
 		if (isClientControllable) {
-			client.createMousePositionPacket();
+			Vector2 mousePos = autoAim ? getPlayerBody(autoAimTargetId).getPosition()
+					: Renderer.getInWorldMousePosition();
+			client.createMousePositionPacket(mousePos);
 		}
 
 		// iterate over all received packets to update gamestate accordingly to
@@ -55,6 +61,9 @@ public final class ClientController extends CommonController implements ControlP
 		}
 
 		if (clientSidePrediction) {
+
+			applyRecentRotationInput();
+
 			// movement
 			appplyRecentMovementInput();
 
@@ -65,11 +74,6 @@ public final class ClientController extends CommonController implements ControlP
 			// grenades
 			if (inputSupplier.getKeysReleased().contains(Keys.G)) {
 				throwGrenade(playerId);
-			}
-			// apply rotation only for controllable player
-			if (isClientControllable) {
-				getPlayerBody(playerId).setTransform(getPlayerBody(playerId).getPosition(),
-						calculateDesiredPlayerRotation(playerId, Renderer.getInWorldMousePosition()));
 			}
 		}
 
@@ -90,10 +94,27 @@ public final class ClientController extends CommonController implements ControlP
 		getPlayerBody(playerId).setLinearVelocity(calculateMovementVector(inputSupplier.getKeysPressed()));
 	}
 
+	private void applyRecentRotationInput() {
+		if (isClientControllable) {
+			if (autoAim) {
+				float desiredAngle = MathUtils.atan2(
+						getPlayer(autoAimTargetId).getPosition().y - getPlayerBody(playerId).getPosition().y,
+						getPlayer(autoAimTargetId).getPosition().x - getPlayerBody(playerId).getPosition().x);
+				getPlayerBody(playerId).setTransform(getPlayerBody(playerId).getPosition(), desiredAngle);
+			} else {
+				getPlayerBody(playerId).setTransform(getPlayerBody(playerId).getPosition(),
+						calculateDesiredPlayerRotation(playerId, Renderer.getInWorldMousePosition()));
+			}
+		}
+	}
+
 	private void refreshPlayerState(PlayerStatePacket statePacket) {
-		//TODO cos zamula przy ustawianiu rotacji, dlatego ustawia ja tylko botom
+
+		// TODO cos zamula przy ustawianiu rotacji, dlatego ustawia ja tylko
+		// botom
 		getPlayerBody(statePacket.playerId).setTransform(statePacket.position,
-				statePacket.playerId == playerId && isClientControllable ? getPlayer(playerId).getAngle() : statePacket.rotation);
+				statePacket.playerId == playerId && isClientControllable ? getPlayer(playerId).getAngle()
+						: statePacket.rotation);
 
 		if (statePacket.playerId != playerId) {
 			return; // below techniques can be only applied to controlled player
@@ -125,5 +146,7 @@ public final class ClientController extends CommonController implements ControlP
 	protected void processPacket(ConfigurationControlPacket packet) {
 		clientSidePrediction = packet.clientSidePrediction;
 		serverReconciliation = packet.serverReconciliation;
+		autoAim = packet.autoAim;
+		autoAimTargetId = packet.autoAimTargetId;
 	}
 }

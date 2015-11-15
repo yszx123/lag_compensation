@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
@@ -93,6 +94,33 @@ public class GameWorld {
 		wallBody.createFixture(fixtureDef);
 
 		wallShape.dispose();
+	}
+	
+	public void createHitParticles(Vector2 pos){
+		float numRays = 4;
+		for (int i = 0; i < numRays; i++) {
+			float angle = (i / numRays) * MathUtils.PI2;
+			Vector2 rayDirection = new Vector2(MathUtils.sin(angle), MathUtils.cos(angle));
+
+			BodyDef bodyDef = new BodyDef();
+			bodyDef.type = BodyType.DynamicBody;
+			bodyDef.fixedRotation = true;
+			bodyDef.bullet = true;
+			bodyDef.linearDamping = 10;
+			bodyDef.position.set(pos);
+			bodyDef.linearVelocity.set(rayDirection.scl(10));
+			Body body = world.createBody(bodyDef);
+
+			CircleShape circleShape = new CircleShape();
+			circleShape.setRadius(0.1f);
+
+			FixtureDef fixtureDef = new FixtureDef();
+			fixtureDef.shape = circleShape;
+			fixtureDef.density = 60f / numRays;
+			fixtureDef.restitution = 0.1f;
+			fixtureDef.filter.categoryBits = -1;
+			body.createFixture(fixtureDef);
+		}
 	}
 	
 }

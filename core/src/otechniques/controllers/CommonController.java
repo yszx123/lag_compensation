@@ -108,11 +108,11 @@ public abstract class CommonController implements ControlPacketObserver {
 
 		RayCastCallback callback = (Fixture fixture, Vector2 point, Vector2 normal, float fraction) -> {
 			Type collidedBodyType = (Type) fixture.getBody().getUserData();
-			if (collidedBodyType == Type.TRASH) {
-				return -1;
-			} else {
+			if(collidedBodyType == Type.PLAYER){
+				gameWorld.createHitParticles(point);
 				return 0;
 			}
+			return -1;
 		};
 
 		Vector2 p1 = getPlayerBody(playerId).getPosition().cpy();

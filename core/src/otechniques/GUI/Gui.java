@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -17,9 +18,12 @@ import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
+import otechniques.FastPaceGame;
 import otechniques.config.Config;
 
 public class Gui implements IGui {
+	public final FastPaceGame game;
+
 	Skin skin = new Skin(Gdx.files.internal("uiskin.json"));;
 	Stage stage;
 
@@ -28,18 +32,26 @@ public class Gui implements IGui {
 	CheckBox clientSidePredictionCB;
 	CheckBox serverReconciliationCB;
 	CheckBox drawStatsCB;
-	
+	CheckBox autoAimCB;
+
+	SelectBox<Integer> autoAimTargetIdSB;
+
 	TextButton resetPlayersButton;
 
 	Slider minPingSlider, maxPingSlider;
 	Slider packetLossRateSlider;
 
+	Label autoAimPlayerIdLabel;
 	Label minPingValueLabel, maxPingValueLabel, packetLossRateValueLabel;
 	Label minPingLabel, maxPingLabel;
 	Label packetLossLabel;
 
 	boolean wasRestedIssued = false;
-	
+
+	public Gui(FastPaceGame game) {
+		this.game = game;
+	}
+
 	public void create(SpriteBatch batch) {
 		Viewport viewport = new ScalingViewport(Scaling.fit, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(),
 				new OrthographicCamera());
@@ -52,6 +64,7 @@ public class Gui implements IGui {
 		clientSidePredictionCB = new CheckBox("Client side prediction", skin);
 		clientSidePredictionCB.setChecked(Config.CLIENT_SIDE_PREDICTION);
 		clientSidePredictionCB.addListener(new ChangeListener() {
+			@Override
 			public void changed(ChangeEvent event, Actor actor) {
 				boolean isChecked = clientSidePredictionCB.isChecked();
 				Config.CLIENT_SIDE_PREDICTION = isChecked;
@@ -60,6 +73,19 @@ public class Gui implements IGui {
 				}
 			}
 		});
+		
+		autoAimCB = new CheckBox("Autoaim", skin);
+		autoAimCB.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				autoAimTargetIdSB.setVisible(autoAimCB.isChecked());
+				autoAimPlayerIdLabel.setVisible(autoAimCB.isChecked());
+			}
+		});
+
+		autoAimTargetIdSB = new SelectBox<>(skin);
+		autoAimTargetIdSB.setItems(game.getNonControllableIds());
+		autoAimTargetIdSB.setVisible(Config.AUTOAIM);
 
 		serverReconciliationCB = new CheckBox("Server reconciliation", skin);
 		serverReconciliationCB.setChecked(Config.SERVER_RECONCILIATION);
@@ -76,15 +102,18 @@ public class Gui implements IGui {
 				drawStats = drawStatsCB.isChecked();
 			}
 		});
-		
+
 		resetPlayersButton = new TextButton("Reset players", skin);
-		resetPlayersButton.addListener(new ChangeListener() {			
+		resetPlayersButton.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
 				wasRestedIssued = true;
 			}
 		});
 
+		autoAimPlayerIdLabel = new Label("Autoaim target ID", skin);
+		autoAimPlayerIdLabel.setVisible(Config.AUTOAIM);
+		
 		minPingLabel = new Label("Min ping", skin);
 		maxPingLabel = new Label("Max ping", skin);
 		packetLossLabel = new Label("Packet Loss in percents", skin);
@@ -142,6 +171,11 @@ public class Gui implements IGui {
 		mainTable.add(resetPlayersButton);
 		mainTable.row();
 
+		mainTable.add(autoAimCB);
+		mainTable.add(autoAimPlayerIdLabel);
+		mainTable.add(autoAimTargetIdSB);
+		mainTable.row();
+
 		mainTable.add(clientSidePredictionCB);
 		mainTable.row();
 
@@ -150,6 +184,7 @@ public class Gui implements IGui {
 	}
 
 	public void render() {
+		autoAimTargetIdSB.setItems(game.getNonControllableIds());
 		stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
 		stage.draw();
 	}
@@ -190,12 +225,22 @@ public class Gui implements IGui {
 	public int getPacketLossRate() {
 		return (int) packetLossRateSlider.getValue();
 	}
-	
-	public boolean wasResetIssued(){
-		if(wasRestedIssued){
+
+	public boolean wasResetIssued() {
+		if (wasRestedIssued) {
 			wasRestedIssued = false;
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public boolean isAutoAim() {
+		return autoAimCB.isChecked();
+	}
+
+	@Override
+	public int getAutoAimTargetId() {
+		return autoAimTargetIdSB.getSelected() == null ? 0 : autoAimTargetIdSB.getSelected();
 	}
 }

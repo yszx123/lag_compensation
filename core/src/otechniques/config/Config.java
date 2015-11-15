@@ -43,6 +43,7 @@ public class Config {
 	
 	public static final float PLAYER_STATE_SENDING_FREQUENCY = 1 / 60f;
 
+	public static boolean AUTOAIM = false;
 	public static boolean SERVER_RECONCILIATION = true;
 	public static boolean CLIENT_SIDE_PREDICTION = true;
 		

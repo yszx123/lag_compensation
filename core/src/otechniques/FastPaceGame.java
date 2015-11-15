@@ -18,7 +18,7 @@ import otechniques.input.InputSupplier;
 import otechniques.input.RandomInputSpoofer;
 import otechniques.network.packets.ConfigurationControlPacket;
 
-public class FastPaceGame extends ApplicationAdapter {
+public final class FastPaceGame extends ApplicationAdapter {
 	private final InputMultiplexer inputMultiplexer = new InputMultiplexer();
 	private SpriteBatch batch;
 	private final ArrayList<ClientPart> nonControllableClients = new ArrayList<>();
@@ -28,33 +28,32 @@ public class FastPaceGame extends ApplicationAdapter {
 	private static int numOfScreenParts = 1;
 	private boolean isGuiOpened;
 
-
 	@Override
 	public void create() {
 		batch = new SpriteBatch();
 		Gdx.input.setInputProcessor(inputMultiplexer);
-		
+
 		createServerPart();
-		
+
 		createGUI();
 		addControlInputHandler();
-		
+
 		createClientPart(true);
 		createClientPart(false);
-		
+
 		configureSubParts();
 	}
 
 	@Override
 	public void render() {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		
-		if(isGuiOpened){
+
+		if (isGuiOpened) {
 			Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 			gui.render();
 			return;
 		}
-			
+
 		serverPart.processServerSide();
 
 		if (controllableClient != null) {
@@ -81,7 +80,7 @@ public class FastPaceGame extends ApplicationAdapter {
 					Gdx.graphics.getWidth() / numOfScreenParts, Gdx.graphics.getHeight());
 			part.renderGraphics();
 		}
-		
+
 	}
 
 	@Override
@@ -89,15 +88,15 @@ public class FastPaceGame extends ApplicationAdapter {
 		if (controllableClient != null) {
 			controllableClient.resize(width, height);
 		}
-		
+
 		for (ClientPart part : nonControllableClients) {
 			part.resize(width, height);
 		}
-		
+
 		serverPart.resize(width, height);
-		
+
 		gui.resize(width, height);
-		
+
 	}
 
 	@Override
@@ -106,24 +105,31 @@ public class FastPaceGame extends ApplicationAdapter {
 			part.dispose();
 		}
 		serverPart.dispose();
-		
+
 	}
 
 	public static float getNumOfScreenParts() {
 		return numOfScreenParts;
 	}
-	
+
+	public Integer[] getNonControllableIds() {
+		Integer[] ids = new Integer[nonControllableClients.size()];
+		for (int i = 0; i < ids.length; i++) {
+			ids[i] = nonControllableClients.get(i).getClientId();
+		}
+		return ids;
+	}
+
 	private void createClientPart(boolean isClientControllable) {
 		InputSupplier inputSupplier;
-		if(isClientControllable){
+		if (isClientControllable) {
 			inputMultiplexer.addProcessor((InputProcessor) (inputSupplier = new InputHandler()));
-		}
-		else{
+		} else {
 			inputSupplier = new RandomInputSpoofer();
 		}
-		
-		ClientPart newClientPart = new ClientPart(isClientControllable, inputSupplier,batch);
-		
+
+		ClientPart newClientPart = new ClientPart(isClientControllable, inputSupplier, batch);
+
 		Gdx.graphics.setDisplayMode(++numOfScreenParts * Config.RENDER_PART_SIZE_PX, Config.RENDER_PART_SIZE_PX, false);
 		if (isClientControllable) {
 			this.controllableClient = newClientPart;
@@ -132,35 +138,38 @@ public class FastPaceGame extends ApplicationAdapter {
 		}
 	}
 
-	private void createServerPart(){
-		serverPart = new ServerPart(batch);;
+	private void createServerPart() {
+		serverPart = new ServerPart(batch);
+		;
 		try {
 			Thread.sleep(30);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 	}
-	
-	private void createGUI(){
-		gui = new Gui();
+
+	private void createGUI() {
+		gui = new Gui(this);
 		gui.create(batch);
 		inputMultiplexer.addProcessor(gui.getInputProcessor());
 	}
-	
-	private void addControlInputHandler(){
-		inputMultiplexer.addProcessor(new InputAdapter(){
-			public boolean keyUp(int key){
-				if(key == Keys.F1){
+
+	private void addControlInputHandler() {
+		inputMultiplexer.addProcessor(new InputAdapter() {
+			public boolean keyUp(int key) {
+				if (key == Keys.F1) {
 					isGuiOpened = !isGuiOpened;
 					configureSubParts();
 				}
-				return false;		
+				return false;
 			}
 		});
 	}
-	
-	private void configureSubParts(){
+
+	private void configureSubParts() {
 		ConfigurationControlPacket p = new ConfigurationControlPacket(Config.runId);
+		p.autoAim = gui.isAutoAim();
+		p.autoAimTargetId = gui.getAutoAimTargetId();
 		p.clientSidePrediction = gui.isClientSidePrediction();
 		p.serverReconciliation = gui.isServerReconciliation();
 		p.minPing = gui.getMinPing();
@@ -168,7 +177,5 @@ public class FastPaceGame extends ApplicationAdapter {
 		p.packetLossRate = gui.getPacketLossRate();
 		p.wasResetIssued = gui.wasResetIssued();
 		serverPart.addReceivedControlPacket(p);
-		
-		
 	}
 }

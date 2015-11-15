@@ -9,6 +9,10 @@ public interface IGui {
 	public boolean isClientSidePrediction();
 
 	public boolean isServerReconciliation();
+	
+	public boolean isAutoAim();
+	
+	public int getAutoAimTargetId();
 
 	public int getMinPing();
 

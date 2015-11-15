@@ -18,7 +18,6 @@ import otechniques.network.packets.ControlPacket;
 import otechniques.network.packets.InputPacket;
 import otechniques.network.packets.MousePositionPacket;
 import otechniques.network.packets.Packet;
-import otechniques.render.Renderer;
 
 public class GameNetworkClient extends PacketManager implements ControlPacketObserver {
 
@@ -66,8 +65,7 @@ public class GameNetworkClient extends PacketManager implements ControlPacketObs
 		packetSendingQueue.add(packet);
 	}
 
-	public void createMousePositionPacket() {
-		Vector2 inWorldMousePos = Renderer.getInWorldMousePosition();
+	public void createMousePositionPacket(Vector2 inWorldMousePos) {
 		MousePositionPacket p = new MousePositionPacket(clientId, clientId, ++lastSequenceNumber, inWorldMousePos);
 		packetSendingQueue.add(p);
 	}

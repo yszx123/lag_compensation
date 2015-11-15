@@ -22,13 +22,15 @@ public class ClientPart {
 	private final GameNetworkClient networkClient;
 	private final GameWorld gameWorld;
 	private final LinkedList<ControlPacketObserver> controlPacketObservers = new LinkedList<>();
+	
+	private final int clientId;
 
 
 	public ClientPart(boolean isClientControllable, InputSupplier inputSupplier, SpriteBatch batch) {
 		this.inputSupplier = inputSupplier;
 
 		networkClient = new GameNetworkClient();
-		int clientId = networkClient.getClientId();
+		clientId = networkClient.getClientId();
 		controlPacketObservers.add(networkClient);
 
 		gameWorld = new GameWorld();
@@ -64,5 +66,9 @@ public class ClientPart {
 
 	public void dispose() {
 		gameWorld.getWorld().dispose();
+	}
+	
+	public int getClientId(){
+		return clientId;
 	}
 }

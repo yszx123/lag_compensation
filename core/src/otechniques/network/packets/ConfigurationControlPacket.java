@@ -3,7 +3,8 @@ package otechniques.network.packets;
 public class ConfigurationControlPacket extends ControlPacket{
 	
 	public int minPing, maxPing;
-	public boolean clientSidePrediction, serverReconciliation;
+	public boolean autoAim, clientSidePrediction, serverReconciliation;
+	public int autoAimTargetId;
 	public int packetLossRate;
 	public boolean wasResetIssued;
 	
