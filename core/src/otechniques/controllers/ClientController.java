@@ -63,8 +63,6 @@ public final class ClientController extends CommonController implements ControlP
 		if (clientSidePrediction) {
 
 			applyRecentRotationInput();
-
-			// movement
 			appplyRecentMovementInput();
 
 			// shooting

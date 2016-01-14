@@ -32,6 +32,7 @@ public abstract class Packet {
 		kryo.register(ControlPacket.class);
 		kryo.register(NewPlayerPacket.class);
 		kryo.register(ConfigurationControlPacket.class);
+		kryo.register(RendererConfigurationControlPacket.class);
 		
 		kryo.register(InputPacket.class);
 		kryo.register(PlayerStatePacket.class);

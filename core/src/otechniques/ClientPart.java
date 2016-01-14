@@ -41,6 +41,8 @@ public class ClientPart {
 
 		renderer = Config.DEBUG_RENDER ? new DebugRenderer(batch, gameWorld)
 				: new StandardRenderer(batch, gameWorld);
+		renderer.setName("Client " + clientId);
+		controlPacketObservers.add(renderer);
 	}
 
 	public void processClientSide() {

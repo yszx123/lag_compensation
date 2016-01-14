@@ -17,6 +17,7 @@ import otechniques.input.InputHandler;
 import otechniques.input.InputSupplier;
 import otechniques.input.RandomInputSpoofer;
 import otechniques.network.packets.ConfigurationControlPacket;
+import otechniques.network.packets.RendererConfigurationControlPacket;
 
 public final class FastPaceGame extends ApplicationAdapter {
 	private final InputMultiplexer inputMultiplexer = new InputMultiplexer();
@@ -42,6 +43,7 @@ public final class FastPaceGame extends ApplicationAdapter {
 		createClientPart(false);
 
 		configureSubParts();
+		configureRenderer();
 	}
 
 	@Override
@@ -160,6 +162,10 @@ public final class FastPaceGame extends ApplicationAdapter {
 				if (key == Keys.F1) {
 					isGuiOpened = !isGuiOpened;
 					configureSubParts();
+					configureRenderer();
+				}else if (key == Keys.F2){
+					gui.setDrawStats(!gui.isDrawStats());
+					configureRenderer();
 				}
 				return false;
 			}
@@ -177,5 +183,11 @@ public final class FastPaceGame extends ApplicationAdapter {
 		p.packetLossRate = gui.getPacketLossRate();
 		p.wasResetIssued = gui.wasResetIssued();
 		serverPart.addReceivedControlPacket(p);
+	}
+	
+	private void configureRenderer(){
+		RendererConfigurationControlPacket rendererPacket = new RendererConfigurationControlPacket(Config.runId);
+		rendererPacket.drawStats = gui.isDrawStats();
+		serverPart.addReceivedControlPacket(rendererPacket);
 	}
 }

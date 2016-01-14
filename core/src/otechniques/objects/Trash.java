@@ -21,13 +21,13 @@ public class Trash extends GameObject {
 
 	@Override
 	public void act(float deltaTime) {
-		if (flaggedForDelete) {
+		if (flaggedForDeletion) {
 			return;
 		}
 
 		if (body.getLinearVelocity().len() >= ObjectsConfig.TRASH_DESTROY_VELOCITY_THRESHOLD) {
 			world.destroyBody(body);
-			flaggedForDelete = true;
+			flaggedForDeletion = true;
 		}
 
 	}

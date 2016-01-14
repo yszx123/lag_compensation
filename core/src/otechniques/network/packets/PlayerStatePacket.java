@@ -6,7 +6,6 @@ public class PlayerStatePacket extends Packet {
 
 	public Vector2 position;
 	public float rotation;
-	public long clientTimestamp;
 	
 	@SuppressWarnings("unused")
 	private PlayerStatePacket() {}

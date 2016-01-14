@@ -19,7 +19,7 @@ public class DebugRenderer extends Renderer{
 	public DebugRenderer(SpriteBatch batch, GameWorld world) {
 		super(batch);
 		this.world = world;
-		renderer.setDrawVelocities(true);
+		renderer.setDrawVelocities(false);
 	}
 	
 	public void render() {
@@ -34,6 +34,12 @@ public class DebugRenderer extends Renderer{
 		}
 		
 		shapeRenderer.end();
+		
+		if(drawStats){
+			batch.begin();	
+			font.draw(batch, name, 30, 23);
+			batch.end();
+		}
 	}
 	
 }

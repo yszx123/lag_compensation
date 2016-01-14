@@ -22,7 +22,7 @@ import otechniques.network.packets.Packet;
 public class GameNetworkClient extends PacketManager implements ControlPacketObserver {
 
 	private int clientId;
-	private final Client client = new Client();;
+	private final Client client = new Client();
 	private Listener currentLagListener;
 
 	private long lastSequenceNumber;

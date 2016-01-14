@@ -59,8 +59,9 @@ public class GameNetworkServer extends PacketManager implements ControlPacketObs
 					new ServerPacketListener(receivedPackets));
 			server.addListener(currentLagListener);
 
-			controlPacketSendingQueue.add(p);
+			
 		}
+		controlPacketSendingQueue.add(packet);
 	}
 
 	public void dispose() {

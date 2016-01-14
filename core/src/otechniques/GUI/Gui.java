@@ -243,4 +243,11 @@ public class Gui implements IGui {
 	public int getAutoAimTargetId() {
 		return autoAimTargetIdSB.getSelected() == null ? 0 : autoAimTargetIdSB.getSelected();
 	}
+
+	public void setDrawStats(boolean drawStats) {
+		this.drawStats = drawStats;
+		this.drawStatsCB.setChecked(drawStats);
+	}
+	
+	
 }

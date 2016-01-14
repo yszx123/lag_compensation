@@ -5,7 +5,7 @@ import com.badlogic.gdx.physics.box2d.World;
 
 public abstract class GameObject {
 
-	protected boolean flaggedForDelete;
+	protected boolean flaggedForDeletion;
 	protected World world;
 	protected Body body;
 	protected Body parentBody;
@@ -24,7 +24,7 @@ public abstract class GameObject {
 	public abstract void act(float deltaTime);
 
 	public boolean isFlaggedForDelete() {
-		return flaggedForDelete;
+		return flaggedForDeletion;
 	}
 	
 	protected void setBody(Body body, Type bodyType) {

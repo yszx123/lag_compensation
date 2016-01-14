@@ -19,5 +19,7 @@ public interface IGui {
 	public int getMaxPing();
 
 	public boolean isDrawStats();
+	
+	public void setDrawStats(boolean drawStats);
 
 }

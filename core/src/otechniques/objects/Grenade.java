@@ -29,7 +29,7 @@ public class Grenade extends GameObject {
 	}
 
 	public void act(float delta) {
-		if (flaggedForDelete) {
+		if (flaggedForDeletion) {
 			return;
 		} else if (hasAlreadyExploded) {
 			timeAfterExplosion += delta;
@@ -37,7 +37,7 @@ public class Grenade extends GameObject {
 				for (Body body : grenadeParticles) {
 					world.destroyBody(body);
 				}
-				flaggedForDelete = true;
+				flaggedForDeletion = true;
 			}
 		} else if (isIgnited) {
 			timeLeftToExplosion -= delta;
@@ -49,7 +49,7 @@ public class Grenade extends GameObject {
 	}
 
 	public void explode() {
-		if (flaggedForDelete) {
+		if (flaggedForDeletion) {
 			throw new IllegalStateException("Attempted to explode grenade, which is marked to be deleted");
 		}
 		world.destroyBody(body);
@@ -58,7 +58,7 @@ public class Grenade extends GameObject {
 	}
 
 	public void throwGrenade() {
-		if (flaggedForDelete || hasAlreadyExploded) {
+		if (flaggedForDeletion || hasAlreadyExploded) {
 			throw new IllegalStateException(
 					"Attempted to throw grenade, which is marked to be deleted or has already exploded");
 		}
