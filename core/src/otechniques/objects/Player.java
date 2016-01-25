@@ -17,7 +17,7 @@ public class Player extends GameObject{
 	private long lastShootTime;
 
 	public Player(int id, float x, float y, World world) {
-		super(world);
+		super(world, null);
 		this.id = id;
 
 		BodyDef bodyDef = new BodyDef();

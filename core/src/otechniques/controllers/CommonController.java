@@ -20,6 +20,7 @@ import otechniques.network.ControlPacketObserver;
 import otechniques.network.packets.ConfigurationControlPacket;
 import otechniques.network.packets.ControlPacket;
 import otechniques.network.packets.NewPlayerPacket;
+import otechniques.objects.Bullet;
 import otechniques.objects.GameObject;
 import otechniques.objects.GameObject.Type;
 import otechniques.objects.GameWorld;
@@ -134,7 +135,12 @@ public abstract class CommonController implements ControlPacketObserver {
 		bodyDef.position.set(p.getPosition());
 		bodyDef.linearVelocity.set(p.getOrientationVector().scl(ObjectsConfig.BULLET_SPEED));
 		Body body = gameWorld.getWorld().createBody(bodyDef);
-
+		body.setUserData(Type.BULLET);
+		Bullet b =new Bullet(gameWorld.getWorld());
+		b.setBody(body);
+		
+		gameWorld.getGameObjects().add(b);
+		
 		CircleShape circleShape = new CircleShape();
 		circleShape.setRadius(0.05f);
 

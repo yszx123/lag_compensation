@@ -1,5 +1,7 @@
 package otechniques.objects;
 
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.World;
 
@@ -9,16 +11,19 @@ public abstract class GameObject {
 	protected World world;
 	protected Body body;
 	protected Body parentBody;
+	public Texture texture;
 	
 	public static enum Type{
 		PLAYER,
 		TRASH,
 		GRENADE,
-		WALL
+		BULLET,
+		WALL;
 	}
 
-	protected GameObject(World world) {
+	protected GameObject(World world, Texture texture) {
 		this.world = world;
+		this.texture = texture;
 	}
 
 	public abstract void act(float deltaTime);
@@ -38,5 +43,12 @@ public abstract class GameObject {
 
 	public void setParentBody(Body parentBody) {
 		this.parentBody = parentBody;
+	}
+	
+	public Vector2 getPosition(){
+		return new Vector2(body.getPosition());
+	}
+	public float getRotationRad(){
+		return body.getAngle();
 	}
 }

@@ -23,6 +23,7 @@ public class DebugRenderer extends Renderer{
 	}
 	
 	public void render() {
+		System.out.println(getInWorldMousePosition());
 		camera.position.set(10, 10, 0);
 		camera.update();
 		renderer.render(world.getWorld(), camera.combined);		
@@ -30,7 +31,8 @@ public class DebugRenderer extends Renderer{
 		shapeRenderer.setProjectionMatrix(camera.combined);
 		
 		for (Player player : world.getPlayers().values()) {
-			shapeRenderer.line(player.getPosition().cpy(), player.getPosition().cpy().add(player.getOrientationVector().scl(Config.RAYCAST_LEN)));
+			shapeRenderer.line(player.getPosition().cpy(), 
+					player.getPosition().cpy().add(player.getOrientationVector().scl(Config.RAYCAST_LEN)));
 		}
 		
 		shapeRenderer.end();

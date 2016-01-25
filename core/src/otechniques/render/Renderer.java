@@ -44,6 +44,10 @@ public abstract class Renderer implements ControlPacketObserver{
 	public static Vector2 getInWorldMousePosition() {
 		Vector3 absoluteMousePos = new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0);
 		Vector3 inWorldMousePos = camera.unproject(absoluteMousePos);
+		//if theres standard renderer attached, it's requried to map pixels to meters
+		if(!Config.DEBUG_RENDER){
+			inWorldMousePos.scl(1f/Config.METERES_TO_PIXELS);
+		}
 		// screen(and also x coordinates) is divided into
 		// parts, so x must be multiplied by number of these parts
 		return new Vector2(inWorldMousePos.x * FastPaceGame.getNumOfScreenParts(), inWorldMousePos.y);

@@ -108,8 +108,6 @@ public final class ClientController extends CommonController implements ControlP
 
 	private void refreshPlayerState(PlayerStatePacket statePacket) {
 
-		// TODO cos zamula przy ustawianiu rotacji, dlatego ustawia ja tylko
-		// botom
 		getPlayerBody(statePacket.playerId).setTransform(statePacket.position,
 				statePacket.playerId == playerId && isClientControllable ? getPlayer(playerId).getAngle()
 						: statePacket.rotation);

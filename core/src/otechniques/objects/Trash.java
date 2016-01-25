@@ -11,11 +11,12 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import otechniques.config.Config;
 import otechniques.config.ObjectsConfig;
+import otechniques.render.StandardRenderer;
 
 public class Trash extends GameObject {
 
 	public Trash(World world, Vector2 pos) {
-		super(world);
+		super(world, StandardRenderer.trashTexture);
 		setBody(createBody(pos), Type.TRASH);
 	}
 

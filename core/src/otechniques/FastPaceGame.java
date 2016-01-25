@@ -49,32 +49,31 @@ public final class FastPaceGame extends ApplicationAdapter {
 	@Override
 	public void render() {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
+				
 		if (isGuiOpened) {
 			Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 			gui.render();
 			return;
 		}
 
+		
 		serverPart.processServerSide();
-
 		if (controllableClient != null) {
 			controllableClient.processClientSide();
 		}
-
 		for (ClientPart part : nonControllableClients) {
 			part.processClientSide();
 		}
 
+		
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth() / numOfScreenParts, Gdx.graphics.getHeight());
 		if (controllableClient != null) {
 			controllableClient.renderGraphics();
 		}
-
+		
 		Gdx.gl.glViewport(Gdx.graphics.getWidth() / numOfScreenParts, 0, Gdx.graphics.getWidth() / numOfScreenParts,
 				Gdx.graphics.getHeight());
 		serverPart.renderGraphics();
-
 		// 2 parts of the screen are reserved for controlled client and server
 		int screenShiftFactor = 2;
 		for (ClientPart part : nonControllableClients) {
@@ -82,7 +81,6 @@ public final class FastPaceGame extends ApplicationAdapter {
 					Gdx.graphics.getWidth() / numOfScreenParts, Gdx.graphics.getHeight());
 			part.renderGraphics();
 		}
-
 	}
 
 	@Override

@@ -2,7 +2,7 @@ package otechniques.config;
 
 public class ObjectsConfig {
 
-	public static final float GRENADE_SIZE = 0.22f;
+	public static final float GRENADE_SIZE = 0.25f;
 	public static final float GRENADE_LINEAR_DAMPING = 1.5f;
 	public static final float GRENADE_EXPLOSION_LATENCY = 2.5f;
 	public static final float GRENADE_EXPLOSION_POWER = 180f;

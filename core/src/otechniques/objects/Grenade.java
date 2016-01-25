@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 
 import otechniques.config.ObjectsConfig;
+import otechniques.render.StandardRenderer;
 
 public class Grenade extends GameObject {
 
@@ -17,13 +18,12 @@ public class Grenade extends GameObject {
 	private boolean hasAlreadyExploded;
 	private float timeLeftToExplosion;
 	private float timeAfterExplosion;
-	private final Body[] grenadeParticles;
+	private final Body[] grenadeParticles = new Body[ObjectsConfig.GRENADE_FRAGS_COUNT];;
 
 	public Grenade(World world, Body parentBody, boolean isIgnited) {
-		super(world);
+		super(world, StandardRenderer.grenadeTexture);
 		setParentBody(parentBody);
 		setBody(createBody(parentBody.getPosition()), Type.GRENADE);
-		this.grenadeParticles = new Body[ObjectsConfig.GRENADE_FRAGS_COUNT];
 		this.isIgnited = isIgnited;
 		this.timeLeftToExplosion = ObjectsConfig.GRENADE_EXPLOSION_LATENCY;
 	}
@@ -54,6 +54,7 @@ public class Grenade extends GameObject {
 		}
 		world.destroyBody(body);
 		hasAlreadyExploded = true;
+		texture = null;
 		createBlastParticles();
 	}
 
@@ -73,8 +74,10 @@ public class Grenade extends GameObject {
 		def.position.set(pos);
 		def.linearDamping = ObjectsConfig.GRENADE_LINEAR_DAMPING;
 		Body body = world.createBody(def);
-		body.setFixedRotation(true);
-
+		body.setFixedRotation(false);
+		body.setAngularDamping(1);
+		body.setAngularVelocity(6);
+		
 		CircleShape shape = new CircleShape();
 		shape.setRadius(ObjectsConfig.GRENADE_SIZE);
 
@@ -113,6 +116,9 @@ public class Grenade extends GameObject {
 
 			grenadeParticles[i] = body;
 		}
+	}
+	public Body[] getFrags(){
+		return grenadeParticles;
 	}
 	
 }

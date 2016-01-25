@@ -13,8 +13,10 @@ public class Config {
 	public static final int CLIENT_CONNECT_TIMEOUT = 5000;
 	public static final String SERVER_HOST = "localhost";
 	public static final int SERVER_PACKET_BUFFER_SIZE = 10;
-	public static final boolean DEBUG_RENDER = true;
-
+	
+	public static final boolean DEBUG_RENDER = false;
+	public static final int METERES_TO_PIXELS = 40;
+	
 	public static final int VELOCITY_ITERATIONS = 8;
 	public static final int POSITION_ITERATIONS = 3;
 
@@ -30,7 +32,7 @@ public class Config {
 	public static final short COLLISION_MASK_SCENERY = -1;
 	public static final short COLLISION_MASK_PLAYER = COLLISION_CATEGORY_SCENERY;
 
-	public static final float INPUT_SPOOFING_CHANGE_FREQ = 4.5f;
+	public static final float INPUT_SPOOFING_CHANGE_FREQ = 1.5f;
 	
 	public static final int NUMBER_OF_SNAPSHOTS_SAVED = 60;
 

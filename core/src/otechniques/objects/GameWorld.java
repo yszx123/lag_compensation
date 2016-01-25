@@ -84,13 +84,13 @@ public class GameWorld {
 		fixtureDef.filter.maskBits = Config.COLLISION_MASK_SCENERY;
 
 		float wallLen = ObjectsConfig.WALL_SIZE;
-		wallShape.setAsBox(wallLen, 0.1f, new Vector2(wallLen, 2 * wallLen), 0);
+		wallShape.setAsBox(wallLen, 0.1f, new Vector2(wallLen, 2 * wallLen - 1.5f), 0);
 		wallBody.createFixture(fixtureDef);
 		wallShape.setAsBox(wallLen, 0.1f, new Vector2(wallLen, 0f), 0);
 		wallBody.createFixture(fixtureDef);
 		wallShape.setAsBox(wallLen, 0.1f, new Vector2(0, wallLen), MathUtils.PI / 2f);
 		wallBody.createFixture(fixtureDef);
-		wallShape.setAsBox(wallLen, 0.1f, new Vector2(2 * wallLen, wallLen), MathUtils.PI / 2f);
+		wallShape.setAsBox(wallLen, 0.1f, new Vector2(2 * wallLen - 1.5f, wallLen), MathUtils.PI / 2f);
 		wallBody.createFixture(fixtureDef);
 
 		wallShape.dispose();

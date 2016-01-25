@@ -75,7 +75,7 @@ public final class ServerController extends CommonController implements ControlP
 		server.addControlPacketToSend(new NewPlayerPacket(Config.runId, packet.playerId));
 	}
 
-	@Override
+
 	protected void processPacket(ConfigurationControlPacket packet) {
 		if (packet.wasResetIssued) {
 			for (Player player : gameWorld.getPlayers().values()) {
