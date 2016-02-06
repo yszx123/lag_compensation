@@ -14,7 +14,7 @@ public class Config {
 	public static final String SERVER_HOST = "localhost";
 	public static final int SERVER_PACKET_BUFFER_SIZE = 10;
 	
-	public static final boolean DEBUG_RENDER = false;
+	public static final boolean DEBUG_RENDER = true;
 	public static final int METERES_TO_PIXELS = 40;
 	
 	public static final int VELOCITY_ITERATIONS = 8;

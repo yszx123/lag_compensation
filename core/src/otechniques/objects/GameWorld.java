@@ -51,13 +51,13 @@ public class GameWorld {
 
 	public void createTrash() {
 		for (int i = 0; i < ObjectsConfig.TRASH_NUM; i++) {
-			float x = MathUtils.random(1, 2 * ObjectsConfig.WALL_SIZE - 1);
-			float y = MathUtils.random(1, 2 * ObjectsConfig.WALL_SIZE - 1);
+			float x = MathUtils.random(2, 2 * ObjectsConfig.WALL_SIZE - 2);
+			float y = MathUtils.random(2, 2 * ObjectsConfig.WALL_SIZE - 2);
 			Trash trash = new Trash(world, new Vector2(x, y));
 			gameObjects.add(trash);
 		}
 	}
-
+   
 	public ArrayList<GameObject> getGameObjects() {
 		return gameObjects;
 	}
